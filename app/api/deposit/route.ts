@@ -5,7 +5,6 @@ import {
   ACTIONS_CORS_HEADERS,
   createPostResponse,
 } from "@solana/actions";
-import { BN } from "bn.js";
 import {
   clusterApiUrl,
   ComputeBudgetProgram,
