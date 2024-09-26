@@ -17,9 +17,10 @@ import {
 export const GET = (req: Request) => {
   const payload: ActionGetResponse = {
     icon: new URL("/megumi.jpg", new URL(req.url).origin).toString(),
-    label: "Pay 0.001 SOL",
-    title: "Spotlight payment",
-    description: "Spotlight payment blinks",
+    label: "Request & Pay 0.001 SOL",
+    title: "Request for Repost",
+    description:
+      "Paste the post URL you'd like for me to repost and click on request, then wait for approval.",
   };
 
   return Response.json(payload, {
