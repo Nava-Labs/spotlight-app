@@ -118,7 +118,7 @@ export function getEscrowVaultGpaBuilder(
 ) {
   const programId = context.programs.getPublicKey(
     'spotlightPrograms',
-    '3F8Um1EUHH2Jt24WYinPyHD4Qzd1DrWU8po25Rn1K9RE'
+    'CgBcBA5wtFsHaSMwDqpoTwweqVarEb8XUMYiLstNJJXo'
   );
   return gpaBuilder(context, programId)
     .registerFields<{

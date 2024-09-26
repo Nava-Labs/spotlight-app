@@ -18,7 +18,7 @@ import {
 } from '../errors';
 
 export const SPOTLIGHT_PROGRAMS_PROGRAM_ID =
-  '3F8Um1EUHH2Jt24WYinPyHD4Qzd1DrWU8po25Rn1K9RE' as PublicKey<'3F8Um1EUHH2Jt24WYinPyHD4Qzd1DrWU8po25Rn1K9RE'>;
+  'CgBcBA5wtFsHaSMwDqpoTwweqVarEb8XUMYiLstNJJXo' as PublicKey<'CgBcBA5wtFsHaSMwDqpoTwweqVarEb8XUMYiLstNJJXo'>;
 
 export function createSpotlightProgramsProgram(): Program {
   return {
