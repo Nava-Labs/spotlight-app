@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -19,9 +20,17 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TwitterIcon, GlobeIcon, SparklesIcon } from "lucide-react";
+import { TwitterIcon, GlobeIcon } from "lucide-react";
 import Link from "next/link";
 import { DialogClose } from "@radix-ui/react-dialog";
+import { useWallet } from "@solana/wallet-adapter-react";
+import {
+  clusterApiUrl,
+  Connection,
+  LAMPORTS_PER_SOL,
+  Transaction,
+} from "@solana/web3.js";
+import { useRequest } from "./request";
 
 // Mock data for thread requests
 const mockThreadRequests = [
@@ -89,6 +98,59 @@ type ThreadRequest = {
 
 export default function Dashboard() {
   const [requests, setRequests] = useState<ThreadRequest[]>(mockThreadRequests);
+  const wallet = useWallet();
+  const [amount, setAmount] = useState("");
+
+  const { requestt } = useRequest();
+
+  const handleRequest = async () => {
+    if (!wallet.publicKey || !amount) {
+      console.error("Wallet not connected or amount not specified");
+      return;
+    }
+
+    try {
+      // Call your endpoint
+      const response = await fetch("/api/request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: parseFloat(amount) * 1e9, // Convert SOL to lamports
+          userPublicKey: wallet.publicKey.toBase58(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to build transaction");
+      }
+
+      const { transaction: serializedTx } = await response.json();
+
+      // Deserialize the transaction
+      const tx = Transaction.from(Buffer.from(serializedTx, "base64"));
+
+      // Sign and send the transaction
+      if (wallet.signTransaction) {
+        const signedTx = await wallet.signTransaction(tx);
+
+        // Send the signed transaction
+        const connection = new Connection(clusterApiUrl("devnet"));
+        const signature = await connection.sendRawTransaction(
+          signedTx.serialize(),
+        );
+
+        await connection.confirmTransaction(signature, "confirmed");
+        console.log("Transaction confirmed:", signature);
+
+        // You might want to update your UI here to reflect the successful transaction
+      }
+    } catch (error) {
+      console.error("Error processing request:", error);
+      // You might want to show an error message to the user here
+    }
+  };
 
   const handleApprove = (id: number) => {
     setRequests(
@@ -301,6 +363,21 @@ export default function Dashboard() {
               {renderRequestList("approved")}
             </TabsContent>
           </Tabs>
+          <input
+            type="number"
+            placeholder="Amount in SOL"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full"
+          />
+
+          <Button
+            onClick={async () => await requestt(1 * LAMPORTS_PER_SOL)}
+            className="w-full"
+            disabled={!wallet.publicKey}
+          >
+            Request SOL
+          </Button>
         </CardContent>
       </Card>
     </div>

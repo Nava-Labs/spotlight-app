@@ -13,19 +13,19 @@ import {
   Signer,
   TransactionBuilder,
   transactionBuilder,
-} from '@metaplex-foundation/umi';
-import { Serializer, struct, u64 } from '@metaplex-foundation/umi/serializers';
+} from "@metaplex-foundation/umi";
+import { Serializer, struct, u64 } from "@metaplex-foundation/umi/serializers";
 import {
   ResolvedAccount,
   ResolvedAccountsWithIndices,
   getAccountMetasAndSigners,
-} from '../shared';
+} from "../shared";
 
 // Accounts.
 export type RequestInstructionAccounts = {
   escrowVault: PublicKey | Pda;
   escrowSolVault: PublicKey | Pda;
-  user: Signer;
+  user: PublicKey;
   systemProgram?: PublicKey | Pda;
 };
 
@@ -38,8 +38,8 @@ export function getRequestInstructionDataSerializer(): Serializer<
   RequestInstructionDataArgs,
   RequestInstructionData
 > {
-  return struct<RequestInstructionData>([['solAmount', u64()]], {
-    description: 'RequestInstructionData',
+  return struct<RequestInstructionData>([["solAmount", u64()]], {
+    description: "RequestInstructionData",
   }) as Serializer<RequestInstructionDataArgs, RequestInstructionData>;
 }
 
@@ -48,13 +48,13 @@ export type RequestInstructionArgs = RequestInstructionDataArgs;
 
 // Instruction.
 export function request(
-  context: Pick<Context, 'programs'>,
-  input: RequestInstructionAccounts & RequestInstructionArgs
+  context: Pick<Context, "programs">,
+  input: RequestInstructionAccounts & RequestInstructionArgs,
 ): TransactionBuilder {
   // Program ID.
   const programId = context.programs.getPublicKey(
-    'spotlightPrograms',
-    'CgBcBA5wtFsHaSMwDqpoTwweqVarEb8XUMYiLstNJJXo'
+    "spotlightPrograms",
+    "CgBcBA5wtFsHaSMwDqpoTwweqVarEb8XUMYiLstNJJXo",
   );
 
   // Accounts.
@@ -69,7 +69,7 @@ export function request(
       isWritable: true as boolean,
       value: input.escrowSolVault ?? null,
     },
-    user: { index: 2, isWritable: true as boolean, value: input.user ?? null },
+    user: { index: 2, isWritable: true as boolean, value: input.user },
     systemProgram: {
       index: 3,
       isWritable: false as boolean,
@@ -83,27 +83,27 @@ export function request(
   // Default values.
   if (!resolvedAccounts.systemProgram.value) {
     resolvedAccounts.systemProgram.value = context.programs.getPublicKey(
-      'splSystem',
-      '11111111111111111111111111111111'
+      "splSystem",
+      "11111111111111111111111111111111",
     );
     resolvedAccounts.systemProgram.isWritable = false;
   }
 
   // Accounts in order.
   const orderedAccounts: ResolvedAccount[] = Object.values(
-    resolvedAccounts
+    resolvedAccounts,
   ).sort((a, b) => a.index - b.index);
 
   // Keys and Signers.
   const [keys, signers] = getAccountMetasAndSigners(
     orderedAccounts,
-    'programId',
-    programId
+    "programId",
+    programId,
   );
 
   // Data.
   const data = getRequestInstructionDataSerializer().serialize(
-    resolvedArgs as RequestInstructionDataArgs
+    resolvedArgs as RequestInstructionDataArgs,
   );
 
   // Bytes Created On Chain.
