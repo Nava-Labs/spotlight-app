@@ -18,39 +18,58 @@ import {
   Transaction,
 } from "@solana/web3.js";
 import BN from "bn.js";
+import { getSupabaseServerClient } from "@/lib/supabase/server-client";
 
-export const GET = (req: Request) => {
-  const baseHref = new URL(
-    `/api/post-request`,
-    new URL(req.url).origin,
-  ).toString();
+export const GET = async (req: Request) => {
+  const requestUrl = new URL(req.url);
+  const { userPubkey } = validatedQueryParams(requestUrl);
+
+  const supabaseClient = getSupabaseServerClient();
+  const { data: user } = await supabaseClient
+    .from("users")
+    .select("*, influencers(*)")
+    .eq("public_key", userPubkey)
+    .single();
+
+  if (user == null) {
+    return Response.json(
+      {
+        err: "Missing public key!",
+      },
+      {
+        status: 400,
+        headers: ACTIONS_CORS_HEADERS,
+      },
+    );
+  }
 
   const payload: ActionGetResponse = {
     icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
     label: "Request & Pay 0.001 SOL", // this value will be ignored since `links.actions` exists
-    title: "Request for Repost",
-    description:
-      "Paste the post URL you'd like for me to repost and click on request, then wait for approval.",
+    title: user.influencers[0].blinks_title,
+    // description:
+    //   "Paste the post URL you'd like for me to repost and click on request, then wait for approval.",
+    description: user.influencers[0].blinks_description,
     links: {
       actions: [
         {
           label: "Request & Pay 0.001 SOL", // button text
-          href: `${baseHref}?addurl={typefully}`,
+          href: `${requestUrl}&addurl={url}`,
           // href: `${baseHref}`,
           type: "transaction",
           parameters: [
             {
-              name: "typefully", // parameter name in the `href` above
-              label: "Enter the typefully form", // placeholder of the text input
+              name: "url", // parameter name in the `href` above
+              label: "Enter the X url", // placeholder of the text input
               required: true,
             },
           ],
         },
-        // {
-        //   label: "form",
-        //   href: "https://google.com",
-        //   type: "external-link",
-        // },
+        //   {
+        //     label: "form",
+        //     href: "https://www.google.com",
+        //     type: "external-link",
+        //   },
       ],
     },
   };
@@ -65,7 +84,8 @@ export const OPTIONS = GET;
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { addurl } = validatedQueryParams(requestUrl);
+    const { userPubkey, addurl } = validatedQueryParams(requestUrl);
+    console.log("userPubkey", userPubkey);
     console.log("addurl", addurl);
 
     const body: ActionPostRequest = await req.json();
@@ -119,13 +139,21 @@ export const POST = async (req: Request) => {
 };
 
 function validatedQueryParams(requestUrl: URL) {
+  let userPubkey: PublicKey = new PublicKey(
+    "A5qUGpPRxJcRptzXBYVD5Pc7sGES7XiXaVfK5TwLqhfg",
+  );
   let addurl: string = "";
+
+  if (requestUrl.searchParams.get("userPubkey")) {
+    userPubkey = new PublicKey(requestUrl.searchParams.get("userPubkey")!);
+  }
 
   if (requestUrl.searchParams.get("addurl")) {
     addurl = requestUrl.searchParams.get("addurl")!;
   }
 
   return {
+    userPubkey,
     addurl,
   };
 }
