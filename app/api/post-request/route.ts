@@ -35,7 +35,7 @@ export const GET = (req: Request) => {
       actions: [
         {
           label: "Request & Pay 0.001 SOL", // button text
-          href: `${baseHref}&additionalUrl={typefully}`,
+          href: `${baseHref}?addurl={typefully}`,
           // href: `${baseHref}`,
           type: "transaction",
           parameters: [
@@ -64,9 +64,9 @@ export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
   try {
-    const requestUrl = new URL(req.url);
-    const { additionalUrl } = validatedQueryParams(requestUrl);
-    console.log("additionalUrl", additionalUrl);
+    // const requestUrl = new URL(req.url);
+    // const { additionalUrl } = validatedQueryParams(requestUrl);
+    // console.log("additionalUrl", additionalUrl);
 
     const body: ActionPostRequest = await req.json();
 
@@ -119,13 +119,13 @@ export const POST = async (req: Request) => {
 };
 
 function validatedQueryParams(requestUrl: URL) {
-  let additionalUrl: string = "";
+  let addurl: string = "";
 
-  if (requestUrl.searchParams.get("additionalUrl")) {
-    additionalUrl = requestUrl.searchParams.get("additionalUrl")!;
+  if (requestUrl.searchParams.get("addurl")) {
+    addurl = requestUrl.searchParams.get("addurl")!;
   }
 
   return {
-    additionalUrl,
+    addurl,
   };
 }
