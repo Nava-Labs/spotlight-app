@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typegen": "supabase gen types typescript --local > app/database.types.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.29.0",
@@ -30,6 +31,10 @@
     "@solana/wallet-adapter-react-ui": "^0.9.35",
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.95.3",
+    "@supabase-cache-helpers/postgrest-react-query": "^1.10.1",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "@tanstack/react-query": "^5.56.2",
     "bn.js": "^5.2.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -38,7 +43,8 @@
     "react": "^18",
     "react-dom": "^18",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "tiny-invariant": "^1.3.3"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.6",
