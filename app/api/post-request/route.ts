@@ -139,9 +139,7 @@ export const POST = async (req: Request) => {
 };
 
 function validatedQueryParams(requestUrl: URL) {
-  let userPubkey: PublicKey = new PublicKey(
-    "A5qUGpPRxJcRptzXBYVD5Pc7sGES7XiXaVfK5TwLqhfg",
-  );
+  let userPubkey: PublicKey = new PublicKey("11111111111111111111111111111111");
   let addurl: string = "";
 
   if (requestUrl.searchParams.get("userPubkey")) {
