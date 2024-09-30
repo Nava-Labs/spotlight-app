@@ -127,8 +127,6 @@ export const POST = async (req: Request) => {
       .eq("public_key", userPubkey)
       .single();
 
-    console.log("data post", user);
-
     const { error } = await supabaseClient.from("requests").insert({
       influencer_id: user?.influencers[0].id,
       status: "requested",
