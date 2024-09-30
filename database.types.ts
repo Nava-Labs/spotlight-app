@@ -34,12 +34,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      collaborations: {
+      influencers: {
+        Row: {
+          blinks_description: string
+          blinks_title: string
+          id: number
+          social_score: number
+          twitter_handle: string | null
+          user_id: number
+        }
+        Insert: {
+          blinks_description?: string
+          blinks_title?: string
+          id?: never
+          social_score?: number
+          twitter_handle?: string | null
+          user_id: number
+        }
+        Update: {
+          blinks_description?: string
+          blinks_title?: string
+          id?: never
+          social_score?: number
+          twitter_handle?: string | null
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      requests: {
         Row: {
           deal_expiry_date: string | null
           details: string | null
           id: number
           influencer_id: number | null
+          request_type: string
           status: string
           user_id: number | null
         }
@@ -48,6 +84,7 @@ export type Database = {
           details?: string | null
           id?: never
           influencer_id?: number | null
+          request_type?: string
           status: string
           user_id?: number | null
         }
@@ -56,6 +93,7 @@ export type Database = {
           details?: string | null
           id?: never
           influencer_id?: number | null
+          request_type?: string
           status?: string
           user_id?: number | null
         }
@@ -76,54 +114,18 @@ export type Database = {
           },
         ]
       }
-      influencers: {
-        Row: {
-          bio: string | null
-          email: string | null
-          id: number
-          name: string | null
-          twitter_handle: string | null
-        }
-        Insert: {
-          bio?: string | null
-          email?: string | null
-          id?: never
-          name?: string | null
-          twitter_handle?: string | null
-        }
-        Update: {
-          bio?: string | null
-          email?: string | null
-          id?: never
-          name?: string | null
-          twitter_handle?: string | null
-        }
-        Relationships: []
-      }
       users: {
         Row: {
-          description: string | null
           id: number
-          name: string | null
           public_key: string
-          twitter_handle: string | null
-          website: string | null
         }
         Insert: {
-          description?: string | null
           id?: never
-          name?: string | null
           public_key: string
-          twitter_handle?: string | null
-          website?: string | null
         }
         Update: {
-          description?: string | null
           id?: never
-          name?: string | null
           public_key?: string
-          twitter_handle?: string | null
-          website?: string | null
         }
         Relationships: []
       }

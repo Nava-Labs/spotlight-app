@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typegen": "supabase gen types typescript --local > app/database.types.ts"
+    "typegen": "supabase gen types typescript --local > ./database.types.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.29.0",
