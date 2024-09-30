@@ -15,7 +15,6 @@ import {
   ComputeBudgetProgram,
   Connection,
   PublicKey,
-  SystemProgram,
   Transaction,
 } from "@solana/web3.js";
 import BN from "bn.js";
@@ -50,10 +49,10 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const requestIx = spotlightProgram.methods
+    const requestIx = await spotlightProgram.methods
       .request(new BN(1000000)) // 0.001 SOL
       .accounts({ escrowVault, escrowSolVault, user: account })
-      .transaction();
+      .instruction();
 
     const transaction = new Transaction();
     transaction.add(
