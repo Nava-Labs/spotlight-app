@@ -27,22 +27,30 @@ export const GET = (req: Request) => {
 
   const payload: ActionGetResponse = {
     icon: new URL("/megumi.jpg", new URL(req.url).origin).toString(),
-    label: "Request & Pay 0.001 SOL", // // this value will be ignored since `links.actions` exists
+    label: "Request & Pay 0.001 SOL", // this value will be ignored since `links.actions` exists
     title: "Request for Repost",
     description:
       "Paste the post URL you'd like for me to repost and click on request, then wait for approval.",
     links: {
       actions: [
         {
-          label: "Send 0.001 SOL", // button text
-          href: `${baseHref}`,
+          label: "Request & Pay 0.001 SOL", // button text
+          href: `${baseHref}&additionalUrl={typefully}`,
+          // href: `${baseHref}`,
           type: "transaction",
+          parameters: [
+            {
+              name: "typefully", // parameter name in the `href` above
+              label: "Enter the typefully form", // placeholder of the text input
+              required: true,
+            },
+          ],
         },
-        {
-          label: "form",
-          href: "https://google.com",
-          type: "external-link",
-        },
+        // {
+        //   label: "form",
+        //   href: "https://google.com",
+        //   type: "external-link",
+        // },
       ],
     },
   };
@@ -56,6 +64,10 @@ export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
   try {
+    const requestUrl = new URL(req.url);
+    const { additionalUrl } = validatedQueryParams(requestUrl);
+    console.log("additionalUrl", additionalUrl);
+
     const body: ActionPostRequest = await req.json();
 
     let account: PublicKey;
@@ -105,3 +117,17 @@ export const POST = async (req: Request) => {
     );
   }
 };
+
+function validatedQueryParams(requestUrl: URL) {
+  let additionalUrl: String = "";
+
+  if (requestUrl.searchParams.get("additionalUrl")) {
+    additionalUrl = requestUrl.searchParams.get("additionalUrl")!;
+  } else {
+    additionalUrl;
+  }
+
+  return {
+    additionalUrl,
+  };
+}
