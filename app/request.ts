@@ -1,68 +1,38 @@
-import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import { walletAdapterIdentity } from "@metaplex-foundation/umi-signer-wallet-adapters";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import BN from "bn.js";
 import {
-  createSpotlightProgramsProgram,
-  request,
-} from "./clients/js/src/generated";
-import { generateSigner, transactionBuilder } from "@metaplex-foundation/umi";
-import { useWallet } from "@solana/wallet-adapter-react";
+  escrowSolVault,
+  escrowVault,
+  spotlightProgram,
+} from "@/lib/anchor/setup";
+import { useCallback, useTransition } from "react";
 
-export function useRequest() {
-  const wallet = useWallet();
-  wallet.connect();
-  const requestt = async (amount: number) => {
-    // Setup umi
-    const umi = createUmi("https://api.devnet.solana.com");
-    umi.use(walletAdapterIdentity(wallet));
-    const spotlightProgram = createSpotlightProgramsProgram();
+export function useSpotlightRequest() {
+  const { publicKey, sendTransaction } = useWallet();
+  const { connection } = useConnection();
 
-    umi.programs.add(spotlightProgram);
-    const myProgram = umi.programs.get("spotlightPrograms");
-    console.log(myProgram);
-    try {
-      const escrowVault = umi.eddsa.findPda(
-        umi.programs.get("spotlightPrograms").publicKey,
-        [Buffer.from("EscrowVault")],
-      );
-      const escrowSolVault = umi.eddsa.findPda(
-        umi.programs.get("spotlightPrograms").publicKey,
-        [Buffer.from("EscrowSolVault")],
-      );
+  const [isRequesting, startRequest] = useTransition();
 
-      const signerAuthority = generateSigner(umi);
+  const request = useCallback(async (amount: number) => {
+    startRequest(async () => {
+      if (!publicKey) return;
+      try {
+        const tx = await spotlightProgram.methods
+          .request(new BN(amount * LAMPORTS_PER_SOL))
+          .accounts({ escrowVault, escrowSolVault, user: publicKey })
+          .transaction();
 
-      const tx = transactionBuilder().add(
-        request(umi, {
-          escrowVault,
-          escrowSolVault,
-          user: wallet.publicKey!,
-          solAmount: amount,
-        }),
-      );
+        const signature = await sendTransaction(tx, connection);
+        console.log("Request transaction signature:", signature);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    });
+  }, []);
 
-      // console.log(tx.getSigners(umi));
-      // const result = await tx.sendAndConfirm(umi);
-      //
-      const signedTx = await tx.buildAndSign(umi);
-      console.log(signedTx);
-      // const signature = await umi.rpc.sendTransaction(signedTx);
-      // // const serializedTx = base58.serialize(builtTx.serialize());
-      // console.log(signature);
-      // const result = await tx.sendAndConfirm(umi);
-      const signature = await umi.rpc.sendTransaction(signedTx);
-      const result = await umi.rpc.confirmTransaction(signature, {
-        strategy: {
-          type: "blockhash",
-          ...(await umi.rpc.getLatestBlockhash()),
-        },
-      });
-
-      console.log("Request transaction signature:", result);
-      return result;
-    } catch (error) {
-      console.error("Error requesting SOL:", error);
-      throw error;
-    }
+  return {
+    request: request,
+    isLoading: isRequesting,
   };
-  return { requestt };
 }

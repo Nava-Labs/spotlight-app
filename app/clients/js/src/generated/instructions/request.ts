@@ -25,7 +25,7 @@ import {
 export type RequestInstructionAccounts = {
   escrowVault: PublicKey | Pda;
   escrowSolVault: PublicKey | Pda;
-  user: PublicKey;
+  user: Signer;
   systemProgram?: PublicKey | Pda;
 };
 
