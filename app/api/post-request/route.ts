@@ -20,12 +20,31 @@ import {
 import BN from "bn.js";
 
 export const GET = (req: Request) => {
+  const baseHref = new URL(
+    `/api/post-request`,
+    new URL(req.url).origin,
+  ).toString();
+
   const payload: ActionGetResponse = {
     icon: new URL("/megumi.jpg", new URL(req.url).origin).toString(),
-    label: "Request & Pay 0.001 SOL",
+    label: "Request & Pay 0.001 SOL", // // this value will be ignored since `links.actions` exists
     title: "Request for Repost",
     description:
       "Paste the post URL you'd like for me to repost and click on request, then wait for approval.",
+    links: {
+      actions: [
+        {
+          label: "Send 0.001 SOL", // button text
+          href: `${baseHref}`,
+          type: "transaction",
+        },
+        {
+          label: "form",
+          href: "https://google.com",
+          type: "external-link",
+        },
+      ],
+    },
   };
 
   return Response.json(payload, {
