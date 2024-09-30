@@ -6,6 +6,11 @@ import {
   createPostResponse,
 } from "@solana/actions";
 import {
+  escrowSolVault,
+  escrowVault,
+  spotlightProgram,
+} from "@/lib/anchor/setup";
+import {
   clusterApiUrl,
   ComputeBudgetProgram,
   Connection,
@@ -13,6 +18,7 @@ import {
   SystemProgram,
   Transaction,
 } from "@solana/web3.js";
+import BN from "bn.js";
 
 export const GET = (req: Request) => {
   const payload: ActionGetResponse = {
@@ -44,14 +50,15 @@ export const POST = async (req: Request) => {
       );
     }
 
+    const requestIx = spotlightProgram.methods
+      .request(new BN(1000000)) // 0.001 SOL
+      .accounts({ escrowVault, escrowSolVault, user: account })
+      .transaction();
+
     const transaction = new Transaction();
     transaction.add(
       ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1000 }),
-      SystemProgram.transfer({
-        fromPubkey: account,
-        toPubkey: new PublicKey("BWm5APyxGkSmDxqKR1KBE1rfBLstai4qopRYeBVMsrZr"),
-        lamports: 1000000, // 0.001 SOL
-      }),
+      requestIx,
     );
 
     transaction.feePayer = account;
