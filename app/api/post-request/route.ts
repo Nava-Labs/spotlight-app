@@ -14,6 +14,7 @@ import {
   clusterApiUrl,
   ComputeBudgetProgram,
   Connection,
+  LAMPORTS_PER_SOL,
   PublicKey,
   Transaction,
 } from "@solana/web3.js";
@@ -43,17 +44,19 @@ export const GET = async (req: Request) => {
     );
   }
 
+  const influencer = user.influencers[0];
+
   const payload: ActionGetResponse = {
     icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
     label: "Request & Pay 0.001 SOL", // this value will be ignored since `links.actions` exists
-    title: user.influencers[0].blinks_title,
+    title: influencer.blinks_title,
     // description:
     //   "Paste the post URL you'd like for me to repost and click on request, then wait for approval.",
-    description: user.influencers[0].blinks_description,
+    description: influencer.blinks_description,
     links: {
       actions: [
         {
-          label: "Request & Pay 0.001 SOL", // button text
+          label: `Request & Pay ${influencer.price} SOL`, // button text
           href: `${requestUrl}&addurl={url}`,
           // href: `${baseHref}`,
           type: "transaction",
@@ -100,8 +103,18 @@ export const POST = async (req: Request) => {
       );
     }
 
+    const supabaseClient = getSupabaseServerClient();
+
+    const { data: user } = await supabaseClient
+      .from("users")
+      .select("*, influencers(*)")
+      .eq("public_key", userPubkey)
+      .single();
+
+    const influencer = user!.influencers[0];
+
     const requestIx = await spotlightProgram.methods
-      .request(new BN(1000000)) // 0.001 SOL
+      .request(new BN(influencer.price * LAMPORTS_PER_SOL))
       .accounts({ escrowVault, escrowSolVault, user: account })
       .instruction();
 
@@ -119,16 +132,8 @@ export const POST = async (req: Request) => {
       await connection.getLatestBlockhash()
     ).blockhash;
 
-    const supabaseClient = getSupabaseServerClient();
-
-    const { data: user } = await supabaseClient
-      .from("users")
-      .select("*, influencers(*)")
-      .eq("public_key", userPubkey)
-      .single();
-
     const { error } = await supabaseClient.from("requests").insert({
-      influencer_id: user?.influencers[0].id,
+      influencer_id: influencer.id,
       status: "requested",
       user_id: user?.id,
       deal_expiry_date: "2024-12-31",
