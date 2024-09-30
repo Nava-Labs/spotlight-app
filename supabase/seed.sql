@@ -18,6 +18,7 @@ create table users (
 create table collaborations (
   id bigint primary key generated always as identity,
   influencer_id bigint references influencers (id),
+  status text check (status in ('requested', 'pending', 'approved')) not null,
   user_id bigint references users (id),
   deal_expiry_date date,
   details text
