@@ -119,12 +119,10 @@ export const POST = async (req: Request) => {
 };
 
 function validatedQueryParams(requestUrl: URL) {
-  let additionalUrl: String = "";
+  let additionalUrl: string = "";
 
   if (requestUrl.searchParams.get("additionalUrl")) {
     additionalUrl = requestUrl.searchParams.get("additionalUrl")!;
-  } else {
-    additionalUrl;
   }
 
   return {
