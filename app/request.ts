@@ -14,22 +14,25 @@ export function useSpotlightRequest() {
 
   const [isRequesting, startRequest] = useTransition();
 
-  const request = useCallback(async (amount: number) => {
-    startRequest(async () => {
-      if (!publicKey) return;
-      try {
-        const tx = await spotlightProgram.methods
-          .request(new BN(amount * LAMPORTS_PER_SOL))
-          .accounts({ escrowVault, escrowSolVault, user: publicKey })
-          .transaction();
+  const request = useCallback(
+    async (amount: number) => {
+      startRequest(async () => {
+        if (!publicKey) return;
+        try {
+          const tx = await spotlightProgram.methods
+            .request(new BN(amount * LAMPORTS_PER_SOL))
+            .accounts({ escrowVault, escrowSolVault, user: publicKey })
+            .transaction();
 
-        const signature = await sendTransaction(tx, connection);
-        console.log("Request transaction signature:", signature);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    });
-  }, []);
+          const signature = await sendTransaction(tx, connection);
+          console.log("Request transaction signature:", signature);
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      });
+    },
+    [publicKey, connection],
+  );
 
   return {
     request: request,
