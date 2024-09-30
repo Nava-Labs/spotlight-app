@@ -39,6 +39,7 @@ export type Database = {
           blinks_description: string
           blinks_title: string
           id: number
+          price: number
           social_score: number
           twitter_handle: string | null
           user_id: number
@@ -47,6 +48,7 @@ export type Database = {
           blinks_description?: string
           blinks_title?: string
           id?: never
+          price: number
           social_score?: number
           twitter_handle?: string | null
           user_id: number
@@ -55,6 +57,7 @@ export type Database = {
           blinks_description?: string
           blinks_title?: string
           id?: never
+          price?: number
           social_score?: number
           twitter_handle?: string | null
           user_id?: number
