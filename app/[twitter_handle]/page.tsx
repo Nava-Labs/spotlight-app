@@ -61,7 +61,36 @@ export default function Dashboard() {
       refetchRequests();
     }
   };
-  const renderRequestList = (status: "requested" | "approved" | "pending") => (
+
+  const handleDeclined = async (id: number) => {
+    const { error } = await client
+      .from("requests")
+      .update({ status: "declined" })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating requests:", error);
+    } else {
+      refetchRequests();
+    }
+  };
+
+  const handleCompleted = async (id: number) => {
+    const { error } = await client
+      .from("requests")
+      .update({ status: "completed" })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating requests:", error);
+    } else {
+      refetchRequests();
+    }
+  };
+
+  const renderRequestList = (
+    status: "requested" | "approved" | "completed" | "declined",
+  ) => (
     <ScrollArea className="h-[600px] pr-4">
       <ul className="space-y-4">
         {requests
@@ -109,7 +138,7 @@ export default function Dashboard() {
                 {status === "requested" && (
                   <div className="flex space-x-2">
                     <Button
-                      // onClick={() => handleStatusChange(request.id, "declined")}
+                      onClick={() => handleDeclined(request.id)}
                       variant="outline"
                       className="rounded-full bg-red-500 text-white"
                     >
@@ -122,6 +151,14 @@ export default function Dashboard() {
                       Accept Tweet
                     </Button>
                   </div>
+                )}
+                {status === "approved" && (
+                  <Button
+                    onClick={() => handleCompleted(request.id)}
+                    className="rounded-full"
+                  >
+                    Completed
+                  </Button>
                 )}
               </div>
             </li>
@@ -192,15 +229,18 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="requested" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-muted">
+            <TabsList className="grid w-full grid-cols-4 rounded-full p-1 bg-muted">
               <TabsTrigger value="requested" className="rounded-full">
                 Requested
               </TabsTrigger>
               <TabsTrigger value="approved" className="rounded-full">
                 Approved
               </TabsTrigger>
-              <TabsTrigger value="pending" className="rounded-full">
-                Pending
+              <TabsTrigger value="completed" className="rounded-full">
+                Completed
+              </TabsTrigger>
+              <TabsTrigger value="declined" className="rounded-full">
+                Declined
               </TabsTrigger>
             </TabsList>
             <TabsContent value="requested">
@@ -209,8 +249,11 @@ export default function Dashboard() {
             <TabsContent value="approved">
               {renderRequestList("approved")}
             </TabsContent>
-            <TabsContent value="pending">
-              {renderRequestList("pending")}
+            <TabsContent value="completed">
+              {renderRequestList("completed")}
+            </TabsContent>
+            <TabsContent value="declined">
+              {renderRequestList("declined")}
             </TabsContent>
           </Tabs>
           <input
