@@ -26,7 +26,7 @@ export const GET = (req: Request) => {
   ).toString();
 
   const payload: ActionGetResponse = {
-    icon: new URL("/megumi.jpg", new URL(req.url).origin).toString(),
+    icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
     label: "Request & Pay 0.001 SOL", // this value will be ignored since `links.actions` exists
     title: "Request for Repost",
     description:
@@ -64,9 +64,9 @@ export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
   try {
-    // const requestUrl = new URL(req.url);
-    // const { additionalUrl } = validatedQueryParams(requestUrl);
-    // console.log("additionalUrl", additionalUrl);
+    const requestUrl = new URL(req.url);
+    const { addurl } = validatedQueryParams(requestUrl);
+    console.log("addurl", addurl);
 
     const body: ActionPostRequest = await req.json();
 
@@ -118,14 +118,14 @@ export const POST = async (req: Request) => {
   }
 };
 
-// function validatedQueryParams(requestUrl: URL) {
-//   let addurl: string = "";
+function validatedQueryParams(requestUrl: URL) {
+  let addurl: string = "";
 
-//   if (requestUrl.searchParams.get("addurl")) {
-//     addurl = requestUrl.searchParams.get("addurl")!;
-//   }
+  if (requestUrl.searchParams.get("addurl")) {
+    addurl = requestUrl.searchParams.get("addurl")!;
+  }
 
-//   return {
-//     addurl,
-//   };
-// }
+  return {
+    addurl,
+  };
+}
