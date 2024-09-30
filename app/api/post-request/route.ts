@@ -132,21 +132,21 @@ export const POST = async (req: Request) => {
       await connection.getLatestBlockhash()
     ).blockhash;
 
-    const { error } = await supabaseClient.from("requests").insert({
-      influencer_id: influencer.id,
-      status: "requested",
-      user_id: user?.id,
-      deal_expiry_date: "2024-12-31",
-      details: "",
-      request_type: "repost",
-    });
+    // const { error } = await supabaseClient.from("requests").insert({
+    //   influencer_id: influencer.id,
+    //   status: "requested",
+    //   user_id: user?.id,
+    //   deal_expiry_date: "2024-12-31",
+    //   details: "",
+    //   request_type: "repost",
+    // });
 
-    if (error) {
-      return Response.json(
-        { msg: "Failed to write to db!", err: error },
-        { status: 400, headers: ACTIONS_CORS_HEADERS },
-      );
-    }
+    // if (error) {
+    //   return Response.json(
+    //     { msg: "Failed to write to db!", err: error },
+    //     { status: 400, headers: ACTIONS_CORS_HEADERS },
+    //   );
+    // }
 
     const payload: ActionPostResponse = await createPostResponse({
       fields: {
