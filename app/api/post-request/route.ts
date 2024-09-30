@@ -118,14 +118,14 @@ export const POST = async (req: Request) => {
   }
 };
 
-function validatedQueryParams(requestUrl: URL) {
-  let addurl: string = "";
+// function validatedQueryParams(requestUrl: URL) {
+//   let addurl: string = "";
 
-  if (requestUrl.searchParams.get("addurl")) {
-    addurl = requestUrl.searchParams.get("addurl")!;
-  }
+//   if (requestUrl.searchParams.get("addurl")) {
+//     addurl = requestUrl.searchParams.get("addurl")!;
+//   }
 
-  return {
-    addurl,
-  };
-}
+//   return {
+//     addurl,
+//   };
+// }
