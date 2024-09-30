@@ -1,4 +1,4 @@
-import { Database } from "@/app/database.types";
+import { Database } from "@/database.types";
 import { createBrowserClient } from "@supabase/ssr";
 
 import invariant from "tiny-invariant";

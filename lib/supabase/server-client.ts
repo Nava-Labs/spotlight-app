@@ -1,4 +1,4 @@
-import { Database } from "@/app/database.types";
+import { Database } from "@/database.types";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import invariant from "tiny-invariant";
