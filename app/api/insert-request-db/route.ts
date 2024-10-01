@@ -4,10 +4,10 @@ import { ACTIONS_CORS_HEADERS, NextAction } from "@solana/actions";
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { creator, title, username, details, type } =
+    const { creator, title, username, details, requestType } =
       validatedQueryParams(requestUrl);
 
-    console.log("Request type", type);
+    console.log("Request type", requestType);
 
     const supabaseClient = getSupabaseServerClient();
 
@@ -31,7 +31,7 @@ export const POST = async (req: Request) => {
       status: "requested",
       deal_expiry_date: "2024-12-31",
       details,
-      request_type: type,
+      request_type: requestType,
       requested_by: username,
       title,
     });
@@ -69,7 +69,7 @@ function validatedQueryParams(requestUrl: URL) {
   let title: string = "";
   let username: string = "";
   let details: string = "";
-  let type: string = "";
+  let requestType: string = "";
 
   if (requestUrl.searchParams.get("creator")) {
     creator = requestUrl.searchParams.get("creator")!;
@@ -87,8 +87,8 @@ function validatedQueryParams(requestUrl: URL) {
     details = requestUrl.searchParams.get("details")!;
   }
 
-  if (requestUrl.searchParams.get("type")) {
-    type = requestUrl.searchParams.get("type")!;
+  if (requestUrl.searchParams.get("requestType")) {
+    requestType = requestUrl.searchParams.get("requestType")!;
   }
 
   return {
@@ -96,6 +96,6 @@ function validatedQueryParams(requestUrl: URL) {
     title,
     username,
     details,
-    type,
+    requestType,
   };
 }
