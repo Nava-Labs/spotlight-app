@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
+import { ACTIONS_CORS_HEADERS } from "@solana/actions";
 
 export const POST = async (req: Request) => {
   try {
@@ -40,10 +41,13 @@ export const POST = async (req: Request) => {
       );
     }
 
-    return Response.json({
-      message: "success",
-      status: 200,
-    });
+    return Response.json(
+      { msg: "Success" },
+      {
+        status: 200,
+        headers: ACTIONS_CORS_HEADERS,
+      },
+    );
   } catch (e) {
     return Response.json({ msg: "Failed to post!", err: e }, { status: 400 });
   }
