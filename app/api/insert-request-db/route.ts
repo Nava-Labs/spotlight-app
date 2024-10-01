@@ -1,5 +1,10 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
-import { ACTIONS_CORS_HEADERS, InlineNextActionLink } from "@solana/actions";
+import {
+  ActionPostResponse,
+  ACTIONS_CORS_HEADERS,
+  createPostResponse,
+  NextAction,
+} from "@solana/actions";
 
 export const POST = async (req: Request) => {
   try {
@@ -41,20 +46,21 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const payload: InlineNextActionLink = {
-      type: "inline",
-      action: {
-        type: "completed",
-        icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
-        title: "Request Completed",
-        description: "Request completed!",
-        label: "Requested!",
-      },
+    const payload: NextAction = {
+      type: "completed",
+      icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
+      title: "Request Completed",
+      description: "Request completed!",
+      label: "Requested!",
     };
 
     return Response.json(payload, {
       status: 200,
-      headers: ACTIONS_CORS_HEADERS,
+      headers: {
+        ...ACTIONS_CORS_HEADERS,
+        "X-Action-Version": "2.1.3",
+        "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      },
     });
   } catch (e) {
     return Response.json({ msg: "Failed to post!", err: e }, { status: 400 });
