@@ -1,8 +1,9 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
 import {
-  ActionGetResponse,
-  // ActionPostResponse,
+  ActionPostResponse,
   ACTIONS_CORS_HEADERS,
+  InlineNextActionLink,
+  NextActionPostRequest,
 } from "@solana/actions";
 
 export const POST = async (req: Request) => {
@@ -45,11 +46,15 @@ export const POST = async (req: Request) => {
       );
     }
 
-    const payload: ActionGetResponse = {
-      icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
-      label: "Requested", // this value will be ignored since `links.actions` exists
-      title: "success",
-      description: "this is sucess",
+    const payload: InlineNextActionLink = {
+      type: "inline",
+      action: {
+        type: "completed",
+        icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
+        title: "Request Completed",
+        description: "Request completed!",
+        label: "Requested!",
+      },
     };
 
     return Response.json(payload, {
