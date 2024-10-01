@@ -1,25 +1,30 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
-import { PublicKey } from "@solana/web3.js";
 
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { userPubkey } = validatedQueryParams(requestUrl);
+    const { creator } = validatedQueryParams(requestUrl);
 
     const supabaseClient = getSupabaseServerClient();
 
-    const { data: user } = await supabaseClient
-      .from("users")
-      .select("*, influencers(*)")
-      .eq("public_key", userPubkey)
+    const { data: influencer } = await supabaseClient
+      .from("influencers")
+      .select("*")
+      .eq("twitter_handle", creator)
       .single();
 
-    const influencer = user!.influencers[0];
+    if (!influencer) {
+      return Response.json(
+        { message: "Can't find any influencer" },
+        {
+          status: 404,
+        },
+      );
+    }
 
     const { error } = await supabaseClient.from("requests").insert({
       influencer_id: influencer.id,
       status: "requested",
-      user_id: user?.id,
       deal_expiry_date: "2024-12-31",
       details: "",
       request_type: "repost",
@@ -42,15 +47,15 @@ export const POST = async (req: Request) => {
 };
 
 function validatedQueryParams(requestUrl: URL) {
-  let userPubkey: PublicKey = new PublicKey("11111111111111111111111111111111");
+  let creator: string = "";
 
-  if (requestUrl.searchParams.get("userPubkey")) {
-    userPubkey = new PublicKey(requestUrl.searchParams.get("userPubkey")!);
+  if (requestUrl.searchParams.get("creator")) {
+    creator = requestUrl.searchParams.get("creator")!;
   } else {
-    throw Error("Missing userPubkey");
+    throw Error("Missing creator");
   }
 
   return {
-    userPubkey,
+    creator,
   };
 }

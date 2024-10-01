@@ -23,16 +23,16 @@ import { getSupabaseServerClient } from "@/lib/supabase/server-client";
 
 export const GET = async (req: Request) => {
   const requestUrl = new URL(req.url);
-  const { userPubkey } = validatedQueryParams(requestUrl);
+  const { creator } = validatedQueryParams(requestUrl);
 
   const supabaseClient = getSupabaseServerClient();
-  const { data: user } = await supabaseClient
-    .from("users")
-    .select("*, influencers(*)")
-    .eq("public_key", userPubkey)
+  const { data: influencer } = await supabaseClient
+    .from("influencers")
+    .select("*")
+    .eq("twitter_handle", creator)
     .single();
 
-  if (user == null) {
+  if (!influencer) {
     return Response.json(
       {
         err: "Missing public key!",
@@ -43,8 +43,6 @@ export const GET = async (req: Request) => {
       },
     );
   }
-
-  const influencer = user.influencers[0];
 
   const payload: ActionGetResponse = {
     icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
@@ -97,8 +95,8 @@ export const OPTIONS = GET;
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { userPubkey, addurl } = validatedQueryParams(requestUrl);
-    console.log("userPubkey", userPubkey);
+    const { creator, addurl } = validatedQueryParams(requestUrl);
+    console.log("userPubkey", creator);
     console.log("addurl", addurl);
 
     const body: ActionPostRequest = await req.json();
@@ -115,13 +113,20 @@ export const POST = async (req: Request) => {
 
     const supabaseClient = getSupabaseServerClient();
 
-    const { data: user } = await supabaseClient
-      .from("users")
-      .select("*, influencers(*)")
-      .eq("public_key", userPubkey)
+    const { data: influencer } = await supabaseClient
+      .from("influencers")
+      .select("*")
+      .eq("twitter_handle", creator)
       .single();
 
-    const influencer = user!.influencers[0];
+    if (!influencer) {
+      return Response.json(
+        { message: "Can't find any influencer" },
+        {
+          status: 404,
+        },
+      );
+    }
 
     const requestIx = await spotlightProgram.methods
       .request(new BN(influencer.price * LAMPORTS_PER_SOL))
@@ -166,7 +171,7 @@ export const POST = async (req: Request) => {
         links: {
           next: {
             type: "post",
-            href: `${requestUrl.origin}/api/insert-request-db?userPubkey=${userPubkey}`,
+            href: `${requestUrl.origin}/api/insert-request-db?creator=${creator}`,
 
             //   type: "inline",
             //   action: {
@@ -198,11 +203,11 @@ export const POST = async (req: Request) => {
 };
 
 function validatedQueryParams(requestUrl: URL) {
-  let userPubkey: PublicKey = new PublicKey("11111111111111111111111111111111");
+  let creator: string = "";
   let addurl: string = "";
 
-  if (requestUrl.searchParams.get("userPubkey")) {
-    userPubkey = new PublicKey(requestUrl.searchParams.get("userPubkey")!);
+  if (requestUrl.searchParams.get("creator")) {
+    creator = requestUrl.searchParams.get("creator")!;
   }
 
   if (requestUrl.searchParams.get("addurl")) {
@@ -210,7 +215,7 @@ function validatedQueryParams(requestUrl: URL) {
   }
 
   return {
-    userPubkey,
+    creator,
     addurl,
   };
 }
