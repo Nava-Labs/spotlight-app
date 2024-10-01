@@ -50,25 +50,28 @@ export const GET = async (req: Request) => {
     icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
     label: "Request & Pay 0.001 SOL", // this value will be ignored since `links.actions` exists
     title: influencer.blinks_title,
-    // description:
-    //   "Paste the post URL you'd like for me to repost and click on request, then wait for approval.",
     description: influencer.blinks_description,
     links: {
       actions: [
         {
           label: `Request & Pay ${influencer.price} SOL`, // button text
-          href: `${requestUrl}&addurl={url}`,
+          href: `${requestUrl}&title={title}&detals={details}&username={username}`,
           type: "transaction",
           parameters: [
             {
-              name: "url", // parameter name in the `href` above
-              label: "Enter the X url", // placeholder of the text input
+              name: "username",
+              label: "Your X handle (i.e @spotlightBlinks)",
+              required: true,
+            },
+            {
+              name: "title", // parameter name in the `href` above
+              label: "Write your campaign title here...", // placeholder of the text input
               required: true,
             },
             {
               type: "textarea",
-              name: "message",
-              label: "What do you expect from this newsletter?",
+              name: "details",
+              label: "Write your post content here...",
               required: true,
             },
           ],
@@ -93,9 +96,13 @@ export const OPTIONS = GET;
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { userPubkey, addurl } = validatedQueryParams(requestUrl);
+    const { userPubkey, title, username, details } =
+      validatedQueryParams(requestUrl);
+
     console.log("userPubkey", userPubkey);
-    console.log("addurl", addurl);
+    console.log("title", title);
+    console.log("details", details);
+    console.log("username", username);
 
     const body: ActionPostRequest = await req.json();
 
@@ -195,18 +202,30 @@ export const POST = async (req: Request) => {
 
 function validatedQueryParams(requestUrl: URL) {
   let userPubkey: PublicKey = new PublicKey("11111111111111111111111111111111");
-  let addurl: string = "";
+  let title: string = "";
+  let username: string = "";
+  let details: string = "";
 
   if (requestUrl.searchParams.get("userPubkey")) {
     userPubkey = new PublicKey(requestUrl.searchParams.get("userPubkey")!);
   }
 
-  if (requestUrl.searchParams.get("addurl")) {
-    addurl = requestUrl.searchParams.get("addurl")!;
+  if (requestUrl.searchParams.get("title")) {
+    title = requestUrl.searchParams.get("title")!;
+  }
+
+  if (requestUrl.searchParams.get("username")) {
+    username = requestUrl.searchParams.get("username")!;
+  }
+
+  if (requestUrl.searchParams.get("details")) {
+    username = requestUrl.searchParams.get("details")!;
   }
 
   return {
     userPubkey,
-    addurl,
+    title,
+    username,
+    details,
   };
 }
