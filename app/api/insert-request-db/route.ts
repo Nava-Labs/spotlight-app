@@ -29,7 +29,7 @@ export const POST = async (req: Request) => {
       status: "requested",
       deal_expiry_date: "2024-12-31",
       details,
-      request_type: requestType == 0 ? "post" : "repost",
+      request_type: requestType == 1 ? "post" : "repost",
       requested_by: username,
       title,
     });
