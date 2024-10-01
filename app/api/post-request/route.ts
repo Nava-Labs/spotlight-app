@@ -66,13 +66,20 @@ export const GET = async (req: Request) => {
               label: "Enter the X url", // placeholder of the text input
               required: true,
             },
+            {
+              type: "textarea",
+              name: "message",
+              label: "What do you expect from this newsletter?",
+              required: true,
+            },
           ],
         },
-        //   {
-        //     label: "form",
-        //     href: "https://www.google.com",
-        //     type: "external-link",
-        //   },
+
+        // {
+        //   label: "form",
+        //   href: "https://www.google.com",
+        //   type: "external-link",
+        // },
       ],
     },
   };
@@ -152,6 +159,12 @@ export const POST = async (req: Request) => {
       fields: {
         transaction,
         type: "transaction",
+        links: {
+          next: {
+            type: "post",
+            href: "https://google.com",
+          },
+        },
       },
     });
 
