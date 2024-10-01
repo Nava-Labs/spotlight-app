@@ -30,7 +30,6 @@ export default function Dashboard() {
   const { data: requestsData, refetch: refetchRequests } = useSupabaseQuery<
     ThreadRequest[]
   >(client.from("requests").select(`*`));
-  console.log(requestsData);
 
   useEffect(() => {
     if (wallet.publicKey) {
@@ -48,7 +47,20 @@ export default function Dashboard() {
     }
   }, [requestsData]);
 
-  const handleApprove = async (id: number) => {
+  const handleAccept = async (id: number) => {
+    const { error } = await client
+      .from("requests")
+      .update({ status: "pending" })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating requests:", error);
+    } else {
+      refetchRequests();
+    }
+  };
+
+  const handleApproved = async (id: number) => {
     const { error } = await client
       .from("requests")
       .update({ status: "approved" })
@@ -61,35 +73,7 @@ export default function Dashboard() {
     }
   };
 
-  const handleDeclined = async (id: number) => {
-    const { error } = await client
-      .from("requests")
-      .update({ status: "declined" })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error updating requests:", error);
-    } else {
-      refetchRequests();
-    }
-  };
-
-  const handleCompleted = async (id: number) => {
-    const { error } = await client
-      .from("requests")
-      .update({ status: "completed" })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error updating requests:", error);
-    } else {
-      refetchRequests();
-    }
-  };
-
-  const renderRequestList = (
-    status: "requested" | "approved" | "completed" | "declined",
-  ) => (
+  const renderRequestList = (status: "requested" | "pending" | "approved") => (
     <ScrollArea className="h-[600px] pr-4">
       <ul className="space-y-4">
         {requests
@@ -98,9 +82,7 @@ export default function Dashboard() {
             <li key={request.id} className="bg-card rounded-xl p-4 shadow-sm">
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="text-lg font-semibold">
-                    {request.users.public_key}
-                  </h3>
+                  <h3 className="text-lg font-semibold">{request.title}</h3>
                   <p className="text-sm text-muted-foreground">
                     {request.request_type}
                   </p>
@@ -135,28 +117,19 @@ export default function Dashboard() {
                   </DialogContent>
                 </Dialog>
                 {status === "requested" && (
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={() => handleDeclined(request.id)}
-                      variant="outline"
-                      className="rounded-full bg-red-500 text-white"
-                    >
-                      Decline
-                    </Button>
-                    <Button
-                      onClick={() => handleApprove(request.id)}
-                      className="rounded-full"
-                    >
-                      Accept Tweet
-                    </Button>
-                  </div>
-                )}
-                {status === "approved" && (
                   <Button
-                    onClick={() => handleCompleted(request.id)}
+                    onClick={() => handleAccept(request.id)}
                     className="rounded-full"
                   >
-                    Completed
+                    Accept Tweet
+                  </Button>
+                )}
+                {status === "pending" && (
+                  <Button
+                    onClick={() => handleApproved(request.id)}
+                    className="rounded-full"
+                  >
+                    Approved
                   </Button>
                 )}
               </div>
@@ -179,31 +152,25 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="requested" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 rounded-full p-1 bg-muted">
+            <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-muted">
               <TabsTrigger value="requested" className="rounded-full">
                 Requested
               </TabsTrigger>
+              <TabsTrigger value="pending" className="rounded-full">
+                Pending
+              </TabsTrigger>
               <TabsTrigger value="approved" className="rounded-full">
                 Approved
-              </TabsTrigger>
-              <TabsTrigger value="completed" className="rounded-full">
-                Completed
-              </TabsTrigger>
-              <TabsTrigger value="declined" className="rounded-full">
-                Declined
               </TabsTrigger>
             </TabsList>
             <TabsContent value="requested">
               {renderRequestList("requested")}
             </TabsContent>
+            <TabsContent value="pending">
+              {renderRequestList("pending")}
+            </TabsContent>
             <TabsContent value="approved">
               {renderRequestList("approved")}
-            </TabsContent>
-            <TabsContent value="completed">
-              {renderRequestList("completed")}
-            </TabsContent>
-            <TabsContent value="declined">
-              {renderRequestList("declined")}
             </TabsContent>
           </Tabs>
           <input

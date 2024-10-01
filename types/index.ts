@@ -25,6 +25,7 @@ export type ThreadRequest = {
   id: number;
   status: string;
   request_type: string;
-  users: User;
+  requested_by: string;
+  title: string;
   details: string;
 };
