@@ -17,13 +17,11 @@ export default function WalletConnect() {
   return (
     <>
       {publicKey ? (
-        <div className="space-y-2">
+        <div className="flex space-x-2 items-center">
+          <p className="text-sm">{truncateAddress(publicKey.toBase58(), 4)}</p>
           <Button onClick={disconnect} variant="destructive">
             Disconnect
           </Button>
-          <p className="text-sm flex justify-end">
-            {truncateAddress(publicKey.toBase58(), 4)}
-          </p>
         </div>
       ) : (
         <Button
