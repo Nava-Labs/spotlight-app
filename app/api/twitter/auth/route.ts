@@ -34,6 +34,7 @@ async function fetchUserToken(code: string) {
     const getTokenResponse = await getTokenRequest.json();
     return getTokenResponse;
   } catch (err) {
+    console.log(err);
     return null;
   }
 }
@@ -57,6 +58,7 @@ async function fetchUserData(accessToken: string) {
     const getUserProfile = await getUserRequest.json();
     return getUserProfile as UserData;
   } catch (err) {
+    console.log(err);
     return null;
   }
 }
@@ -91,6 +93,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (err) {
+    console.log(err);
     return NextResponse.json({ error: "An error occurred" }, { status: 400 });
   }
 }
