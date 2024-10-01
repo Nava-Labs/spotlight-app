@@ -174,7 +174,7 @@ export const POST = async (req: Request) => {
         links: {
           next: {
             type: "post",
-            href: `${requestUrl.origin}/api/insert-request-db?creator=${creator}`,
+            href: `${requestUrl.origin}/api/insert-request-db?creator=${creator}&title=${title}&details=${details}&username=${username}`,
 
             //   type: "inline",
             //   action: {

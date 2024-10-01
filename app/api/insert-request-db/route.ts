@@ -3,7 +3,8 @@ import { getSupabaseServerClient } from "@/lib/supabase/server-client";
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { creator } = validatedQueryParams(requestUrl);
+    const { creator, title, username, details } =
+      validatedQueryParams(requestUrl);
 
     const supabaseClient = getSupabaseServerClient();
 
@@ -26,8 +27,10 @@ export const POST = async (req: Request) => {
       influencer_id: influencer.id,
       status: "requested",
       deal_expiry_date: "2024-12-31",
-      details: "",
+      details,
       request_type: "repost",
+      requested_by: username,
+      title,
     });
 
     if (error) {
@@ -48,14 +51,30 @@ export const POST = async (req: Request) => {
 
 function validatedQueryParams(requestUrl: URL) {
   let creator: string = "";
+  let title: string = "";
+  let username: string = "";
+  let details: string = "";
 
   if (requestUrl.searchParams.get("creator")) {
     creator = requestUrl.searchParams.get("creator")!;
-  } else {
-    throw Error("Missing creator");
+  }
+
+  if (requestUrl.searchParams.get("title")) {
+    title = requestUrl.searchParams.get("title")!;
+  }
+
+  if (requestUrl.searchParams.get("username")) {
+    username = requestUrl.searchParams.get("username")!;
+  }
+
+  if (requestUrl.searchParams.get("details")) {
+    details = requestUrl.searchParams.get("details")!;
   }
 
   return {
     creator,
+    title,
+    username,
+    details,
   };
 }
