@@ -159,13 +159,17 @@ export const POST = async (req: Request) => {
       fields: {
         transaction,
         type: "transaction",
+
         links: {
           next: {
             type: "inline",
             action: {
               type: "completed",
               label: "this is next label",
-              icon: "",
+              icon: new URL(
+                "/Spotlight.jpg",
+                new URL(req.url).origin,
+              ).toString(),
               title: "completed state",
               description: "this is next",
             },
