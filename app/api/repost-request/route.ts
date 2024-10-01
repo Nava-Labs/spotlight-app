@@ -95,9 +95,12 @@ export const OPTIONS = GET;
 export const POST = async (req: Request) => {
   try {
     const requestUrl = new URL(req.url);
-    const { creator, addurl } = validatedQueryParams(requestUrl);
+    const { creator, title, username, details } =
+      validatedQueryParams(requestUrl);
     console.log("userPubkey", creator);
-    console.log("addurl", addurl);
+    console.log("title", title);
+    console.log("username", username);
+    console.log("details", details);
 
     const body: ActionPostRequest = await req.json();
 
