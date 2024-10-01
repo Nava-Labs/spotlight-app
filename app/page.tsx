@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -94,9 +94,13 @@ export default function Dashboard() {
   const wallet = useWallet();
   const [amount, setAmount] = useState("");
 
-  wallet.connect();
-
   const { request, isLoading } = useSpotlightRequest();
+
+  useEffect(() => {
+    if (wallet.publicKey) {
+      wallet.connect();
+    }
+  }, [wallet.publicKey]);
 
   const handleApprove = (id: number) => {
     setRequests(

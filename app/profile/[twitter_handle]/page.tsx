@@ -14,10 +14,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useSpotlightRequest } from "../request";
-import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { useSpotlightRequest } from "../../request";
 import { ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
+import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
 
 export default function Dashboard() {
   const [requests, setRequests] = useState<ThreadRequest[]>([]);
@@ -25,18 +25,18 @@ export default function Dashboard() {
   const [amount, setAmount] = useState("");
   const client = useSupabaseBrowser();
 
-  wallet.connect();
-
   const { request, isLoading } = useSpotlightRequest();
 
   const { data: requestsData, refetch: refetchRequests } = useSupabaseQuery<
     ThreadRequest[]
-  >(
-    client.from("requests").select(`
-        *,
-        users:user_id (*)
-      `),
-  );
+  >(client.from("requests").select(`*`));
+  console.log(requestsData);
+
+  useEffect(() => {
+    if (wallet.publicKey) {
+      wallet.connect();
+    }
+  }, [wallet.publicKey]);
 
   useEffect(() => {
     if (requestsData) {
