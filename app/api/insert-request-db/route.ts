@@ -44,8 +44,8 @@ export const POST = async (req: Request) => {
     const payload: NextAction = {
       type: "completed",
       icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
-      title: "Request Completed",
-      description: "Request completed!",
+      title: "Request Completed!",
+      description: "Request submitted. Wait for approval from blinks owner!",
       label: "Requested!",
     };
 
