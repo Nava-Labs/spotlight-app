@@ -58,7 +58,6 @@ export const GET = async (req: Request) => {
         {
           label: `Request & Pay ${influencer.price} SOL`, // button text
           href: `${requestUrl}&addurl={url}`,
-          // href: `${baseHref}`,
           type: "transaction",
           parameters: [
             {
@@ -162,17 +161,21 @@ export const POST = async (req: Request) => {
 
         links: {
           next: {
-            type: "inline",
-            action: {
-              type: "completed",
-              label: "this is next label",
-              icon: new URL(
-                "/Spotlight.jpg",
-                new URL(req.url).origin,
-              ).toString(),
-              title: "completed state",
-              description: "this is next",
-            },
+            type: "post",
+            href: `${requestUrl.origin}/api/insert-request-db?userPubkey=${userPubkey}`,
+
+            //   type: "inline",
+            //   action: {
+            //     type: "completed",
+            //     label: "this is next label",
+            //     icon: new URL(
+            //       "/Spotlight.jpg",
+            //       new URL(req.url).origin,
+            //     ).toString(),
+            //     title: "completed state",
+            //     description: "this is next",
+            //   },
+            // },
           },
         },
       },
