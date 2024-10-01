@@ -219,7 +219,7 @@ function validatedQueryParams(requestUrl: URL) {
   }
 
   if (requestUrl.searchParams.get("details")) {
-    username = requestUrl.searchParams.get("details")!;
+    details = requestUrl.searchParams.get("details")!;
   }
 
   return {
