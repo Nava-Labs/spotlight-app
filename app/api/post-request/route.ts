@@ -53,7 +53,7 @@ export const GET = async (req: Request) => {
       actions: [
         {
           label: `Request & Pay ${influencer.price} SOL`, // button text
-          href: `${requestUrl}&title={title}&detals={details}&username={username}`,
+          href: `${requestUrl}&title={title}&details={details}&username={username}`,
           type: "transaction",
           parameters: [
             {

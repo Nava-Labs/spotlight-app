@@ -55,7 +55,7 @@ export const GET = async (req: Request) => {
       actions: [
         {
           label: `Request & Pay ${influencer.price} SOL`, // button text
-          href: `${requestUrl}&title={title}&url={url}&username={username}`,
+          href: `${requestUrl}&title={title}&details={details}&username={username}`,
           type: "transaction",
           parameters: [
             {
@@ -69,7 +69,7 @@ export const GET = async (req: Request) => {
               required: true,
             },
             {
-              name: "url", // parameter name in the `href` above
+              name: "details", // parameter name in the `href` above
               label: "Enter the X url you'd like to repost", // placeholder of the text input
               required: true,
             },
@@ -204,18 +204,30 @@ export const POST = async (req: Request) => {
 
 function validatedQueryParams(requestUrl: URL) {
   let creator: string = "";
-  let addurl: string = "";
+  let title: string = "";
+  let username: string = "";
+  let details: string = "";
 
   if (requestUrl.searchParams.get("creator")) {
     creator = requestUrl.searchParams.get("creator")!;
   }
 
-  if (requestUrl.searchParams.get("addurl")) {
-    addurl = requestUrl.searchParams.get("addurl")!;
+  if (requestUrl.searchParams.get("title")) {
+    title = requestUrl.searchParams.get("title")!;
+  }
+
+  if (requestUrl.searchParams.get("username")) {
+    username = requestUrl.searchParams.get("username")!;
+  }
+
+  if (requestUrl.searchParams.get("details")) {
+    details = requestUrl.searchParams.get("details")!;
   }
 
   return {
     creator,
-    addurl,
+    title,
+    username,
+    details,
   };
 }
