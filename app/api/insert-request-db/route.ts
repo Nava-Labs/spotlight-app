@@ -7,6 +7,8 @@ export const POST = async (req: Request) => {
     const { creator, title, username, details, requestType } =
       validatedQueryParams(requestUrl);
 
+    console.log("Request type", requestType);
+
     const supabaseClient = getSupabaseServerClient();
 
     const { data: influencer } = await supabaseClient
@@ -67,7 +69,7 @@ function validatedQueryParams(requestUrl: URL) {
   let title: string = "";
   let username: string = "";
   let details: string = "";
-  let requestType: number = 0; // 0 -> Post, 1 -> Repost
+  let requestType: number = 1; // 1 -> Post, 2 -> Repost
 
   if (requestUrl.searchParams.get("creator")) {
     creator = requestUrl.searchParams.get("creator")!;
