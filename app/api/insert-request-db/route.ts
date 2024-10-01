@@ -42,20 +42,8 @@ export const POST = async (req: Request) => {
     }
 
     const payload: ActionPostResponse = {
-      type: "post",
-      message: "Action completed successfully",
-      links: {
-        next: {
-          type: "inline",
-          action: {
-            type: "completed",
-            icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
-            title: "Action Completed",
-            description: "Your action has been successfully completed.",
-            label: "Done",
-          },
-        },
-      },
+      type: "external-link",
+      externalLink: "https://google.com",
     };
 
     return Response.json(payload, {
