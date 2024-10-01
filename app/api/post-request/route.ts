@@ -46,7 +46,7 @@ export const GET = async (req: Request) => {
 
   const payload: ActionGetResponse = {
     icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
-    label: "Request & Pay 0.001 SOL", // this value will be ignored since `links.actions` exists
+    label: "Request & Pay", // this value will be ignored since `links.actions` exists
     title: influencer.blinks_title,
     description: influencer.blinks_description,
     links: {
@@ -176,17 +176,16 @@ export const POST = async (req: Request) => {
             type: "post",
             href: `${requestUrl.origin}/api/insert-request-db?creator=${creator}&title=${title}&details=${details}&username=${username}`,
 
-            //   type: "inline",
-            //   action: {
-            //     type: "completed",
-            //     label: "this is next label",
-            //     icon: new URL(
-            //       "/Spotlight.jpg",
-            //       new URL(req.url).origin,
-            //     ).toString(),
-            //     title: "completed state",
-            //     description: "this is next",
-            //   },
+            // type: "inline",
+            // action: {
+            //   type: "completed",
+            //   label: "this is next label",
+            //   icon: new URL(
+            //     "/Spotlight.jpg",
+            //     new URL(req.url).origin,
+            //   ).toString(),
+            //   title: "completed state",
+            //   description: "this is next",
             // },
           },
         },
