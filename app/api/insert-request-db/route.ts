@@ -1,10 +1,5 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
-import {
-  ActionPostResponse,
-  ACTIONS_CORS_HEADERS,
-  createPostResponse,
-  NextAction,
-} from "@solana/actions";
+import { ACTIONS_CORS_HEADERS, NextAction } from "@solana/actions";
 
 export const POST = async (req: Request) => {
   try {
