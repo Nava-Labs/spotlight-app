@@ -53,7 +53,7 @@ export const GET = async (req: Request) => {
       actions: [
         {
           label: `Request & Pay ${influencer.price} SOL`, // button text
-          href: `${requestUrl}&requestType=post&title={title}&details={details}&username={username}`,
+          href: `${requestUrl}&title={title}&details={details}&username={username}`,
           type: "transaction",
           parameters: [
             {
@@ -178,7 +178,7 @@ export const POST = async (req: Request) => {
         links: {
           next: {
             type: "post",
-            href: `${requestUrl.origin}/api/insert-request-db?creator=${creator}&title=${title}&details=${details}&username=${username}`,
+            href: `${requestUrl.origin}/api/insert-request-db?creator=${creator}&requestType=post&title=${title}&details=${details}&username=${username}`,
 
             // type: "inline",
             // action: {
