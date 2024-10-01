@@ -1,5 +1,9 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
-import { ACTIONS_CORS_HEADERS } from "@solana/actions";
+import {
+  ActionPostResponse,
+  ACTIONS_CORS_HEADERS,
+  createPostResponse,
+} from "@solana/actions";
 
 export const POST = async (req: Request) => {
   try {
@@ -41,13 +45,27 @@ export const POST = async (req: Request) => {
       );
     }
 
-    return Response.json(
-      { msg: "Success" },
-      {
-        status: 200,
-        headers: ACTIONS_CORS_HEADERS,
+    const payload: ActionPostResponse = {
+      type: "post",
+      message: "Action completed successfully",
+      links: {
+        next: {
+          type: "inline",
+          action: {
+            type: "completed",
+            icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
+            title: "Action Completed",
+            description: "Your action has been successfully completed.",
+            label: "Done",
+          },
+        },
       },
-    );
+    };
+
+    return Response.json(payload, {
+      status: 200,
+      headers: ACTIONS_CORS_HEADERS,
+    });
   } catch (e) {
     return Response.json({ msg: "Failed to post!", err: e }, { status: 400 });
   }
