@@ -161,8 +161,14 @@ export const POST = async (req: Request) => {
         type: "transaction",
         links: {
           next: {
-            type: "post",
-            href: "https://google.com",
+            type: "inline",
+            action: {
+              type: "completed",
+              label: "this is next label",
+              icon: "",
+              title: "completed state",
+              description: "this is next",
+            },
           },
         },
       },
