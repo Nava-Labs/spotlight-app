@@ -1,7 +1,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
 import {
   ActionGetResponse,
-  ActionPostResponse,
+  // ActionPostResponse,
   ACTIONS_CORS_HEADERS,
 } from "@solana/actions";
 
