@@ -28,10 +28,10 @@ export const POST = async (req: Request) => {
 
     switch (params.requestType) {
       case "post":
-        postAction(req, params, influencer);
+        await postAction(req, params, influencer);
         break;
       case "repost":
-        repostAction(req, params, influencer);
+        await repostAction(req, params, influencer);
         break;
 
       default:
