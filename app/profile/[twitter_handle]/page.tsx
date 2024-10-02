@@ -18,18 +18,33 @@ import { useSpotlightRequest } from "../../request";
 import { ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
+import { useParams } from "next/navigation";
 
 export default function Dashboard() {
   const [requests, setRequests] = useState<ThreadRequest[]>([]);
   const wallet = useWallet();
   const [amount, setAmount] = useState("");
   const client = useSupabaseBrowser();
+  const params = useParams();
+  const twitterHandle = params.twitter_handle;
 
   const { request, isLoading } = useSpotlightRequest();
 
-  const { data: requestsData, refetch: refetchRequests } = useSupabaseQuery<
-    ThreadRequest[]
-  >(client.from("requests").select(`*`));
+  const { data: influencerData } = useSupabaseQuery(
+    client
+      .from("influencers")
+      .select("id")
+      .eq("twitter_handle", twitterHandle)
+      .single(),
+  );
+
+  const { data: requestsData, refetch: refetchRequests } = useSupabaseQuery(
+    client
+      .from("requests")
+      .select("*")
+      .eq("influencer_id", influencerData?.id ?? ""),
+    { enabled: !!influencerData },
+  );
 
   useEffect(() => {
     if (wallet.publicKey) {
