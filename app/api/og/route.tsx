@@ -51,14 +51,14 @@ export async function GET(request: NextRequest) {
           }}
         />
         <div tw="flex flex-col justify-center items-center mx-80">
-          {/* <img */}
-          {/*   width="400" */}
-          {/*   height="400" */}
-          {/*   src={`https://pbs.twimg.com/profile_images/1837747151927185408/2C6--z0u_400x400.jpg`} */}
-          {/*   style={{ */}
-          {/*     borderRadius: 128, */}
-          {/*   }} */}
-          {/* /> */}
+          <img
+            width="400"
+            height="400"
+            src={`https://pbs.twimg.com/profile_images/1837747151927185408/2C6--z0u_400x400.jpg`}
+            style={{
+              borderRadius: 128,
+            }}
+          />
           <p tw="text-9xl text-white mt-20">twitter.com/{twitterHandle}</p>
         </div>
       </div>
