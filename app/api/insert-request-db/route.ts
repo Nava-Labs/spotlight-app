@@ -109,7 +109,7 @@ async function repostAction(
       "Content-type": "application/json",
       Authorization: `Bearer ${influencer.access_token}`,
     },
-    body: JSON.stringify({ text: "Testing" }),
+    body: JSON.stringify({ text: tweet_id }),
   });
 
   const res = await postTweet.json();
