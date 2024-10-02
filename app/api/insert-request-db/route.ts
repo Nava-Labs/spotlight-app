@@ -28,11 +28,9 @@ export const POST = async (req: Request) => {
 
     switch (params.requestType) {
       case "post":
-        await postAction(req, params, influencer);
-        break;
+        return await postAction(req, params, influencer);
       case "repost":
-        await repostAction(req, params, influencer);
-        break;
+        return await repostAction(req, params, influencer);
 
       default:
         break;
