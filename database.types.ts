@@ -41,6 +41,7 @@ export type Database = {
           blinks_title: string
           id: number
           price: Json | null
+          public_key: string
           social_score: number
           twitter_handle: string | null
           twitter_id: string | null
@@ -51,6 +52,7 @@ export type Database = {
           blinks_title?: string
           id?: never
           price?: Json | null
+          public_key: string
           social_score?: number
           twitter_handle?: string | null
           twitter_id?: string | null
@@ -61,6 +63,7 @@ export type Database = {
           blinks_title?: string
           id?: never
           price?: Json | null
+          public_key?: string
           social_score?: number
           twitter_handle?: string | null
           twitter_id?: string | null
@@ -73,6 +76,7 @@ export type Database = {
           details: string | null
           id: number
           influencer_id: number | null
+          public_key: string
           request_type: string
           requested_by: string
           status: string
@@ -83,6 +87,7 @@ export type Database = {
           details?: string | null
           id?: never
           influencer_id?: number | null
+          public_key: string
           request_type?: string
           requested_by: string
           status: string
@@ -93,6 +98,7 @@ export type Database = {
           details?: string | null
           id?: never
           influencer_id?: number | null
+          public_key?: string
           request_type?: string
           requested_by?: string
           status?: string

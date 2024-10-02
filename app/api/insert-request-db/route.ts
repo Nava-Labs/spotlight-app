@@ -1,6 +1,10 @@
 import { Database } from "@/database.types";
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
-import { ACTIONS_CORS_HEADERS, NextAction } from "@solana/actions";
+import {
+  ActionPostRequest,
+  ACTIONS_CORS_HEADERS,
+  NextAction,
+} from "@solana/actions";
 
 type Influencer = Database["public"]["Tables"]["influencers"]["Row"];
 
@@ -45,9 +49,12 @@ async function postAction(
   params: ReturnType<typeof validatedQueryParams>,
   influencer: Influencer,
 ) {
+  const body: ActionPostRequest = await req.json();
+
   const supabaseClient = getSupabaseServerClient();
   const { requestType, username, details, title } = params;
   const { error } = await supabaseClient.from("requests").insert({
+    public_key: body.account,
     influencer_id: influencer.id,
     status: "requested",
     deal_expiry_date: "2024-12-31",

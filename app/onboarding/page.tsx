@@ -5,6 +5,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import {
   Dispatch,
   SetStateAction,
+  Suspense,
   useEffect,
   useMemo,
   useState,
@@ -31,7 +32,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { NumberInput } from "@/components/ui/number-input";
 import getSupabaseBrowserClient from "@/lib/supabase/browser-client";
-import { BadgeCheck, CircleCheckBig } from "lucide-react";
+import { CircleCheckBig } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { publicKey } from "@coral-xyz/anchor/dist/cjs/utils";
 
 const formSchema = z.object({
   blinks_title: z.string().min(2).max(50),
@@ -43,9 +46,18 @@ const formSchema = z.object({
 });
 
 export default function Onboarding() {
+  return (
+    <Suspense>
+      <OnboardingWrapper />
+    </Suspense>
+  );
+}
+
+const OnboardingWrapper = () => {
   // NOTE: the order of it is important
   const tabs = ["account", "information", "pricing", "completed"];
 
+  const wallet = useWallet();
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = getSupabaseBrowserClient();
@@ -72,13 +84,18 @@ export default function Onboarding() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const twitter_id = searchParams.get("user");
+    if (!publicKey) return alert("Please connect your wallet first");
+    if (!twitter_id) return alert("No twitter id");
+
     setSelectedTab("completed");
     startTransition(async () => {
-      const twitter_id = searchParams.get("user");
-      if (!twitter_id) return alert("No twitter id");
       await supabase
         .from("influencers")
-        .update(values)
+        .update({
+          ...values,
+          public_key: wallet.publicKey!.toString(),
+        })
         .eq("twitter_id", twitter_id);
       console.log(values);
     });
@@ -105,7 +122,7 @@ export default function Onboarding() {
                 />
                 <PricingTab onSuccess={() => {}} setTab={setSelectedTab} />
                 <CompletedTab
-                  isLoading={false}
+                  isLoading={isLoading}
                   onSuccess={() =>
                     router.push(`/profile/${searchParams.get("username")}`)
                   }
@@ -117,7 +134,7 @@ export default function Onboarding() {
       </div>
     </div>
   );
-}
+};
 
 const AccountTab = () => {
   const getTwitterOauthUrl = () => {
@@ -306,8 +323,8 @@ const CompletedTab = ({
             <CircleCheckBig className="w-20 h-20 stroke-[1.5] text-zinc-400" />
             <p className="text-xl font-semibold mt-4">Submitted</p>
             <p className="text-muted-foreground mt-1 mb-4">
-              Registration is completed! click "Go to Profile" to get access to
-              your blinks
+              Registration is completed! click &quot;Go to Profile&quot; to get
+              access to your blinks
             </p>
             <Button onClick={onSuccess}>Go to Profile</Button>
           </div>

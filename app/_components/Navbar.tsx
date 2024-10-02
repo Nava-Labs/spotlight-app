@@ -3,9 +3,6 @@
 import Link from "next/link";
 import WalletConnect from "./ConnectWallet";
 import { Button } from "@/components/ui/button";
-import { TWITTER_CALLBACK_URL } from "@/lib/constants";
-
-import { Dispatch, SetStateAction, useState } from "react";
 
 export default function Navbar() {
   // const { publicKey } = useWallet();

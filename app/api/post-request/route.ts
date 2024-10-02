@@ -136,7 +136,8 @@ export const POST = async (req: Request) => {
     }
 
     const requestIx = await spotlightProgram.methods
-      .request(new BN(influencer.price * LAMPORTS_PER_SOL))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .request(new BN((influencer.price as any).post * LAMPORTS_PER_SOL))
       .accounts({ escrowVault, escrowSolVault, user: account })
       .instruction();
 
