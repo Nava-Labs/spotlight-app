@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { TWITTER_CALLBACK_URL } from "@/lib/constants";
 
 export default function Navbar() {
-  const { publicKey } = useWallet();
+  // const { publicKey } = useWallet();
 
   const getTwitterOauthUrl = () => {
     const rootUrl = "https://twitter.com/i/oauth2/authorize";
