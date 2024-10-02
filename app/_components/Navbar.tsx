@@ -5,24 +5,10 @@ import WalletConnect from "./ConnectWallet";
 import { Button } from "@/components/ui/button";
 import { TWITTER_CALLBACK_URL } from "@/lib/constants";
 
+import { Dispatch, SetStateAction, useState } from "react";
+
 export default function Navbar() {
   // const { publicKey } = useWallet();
-
-  const getTwitterOauthUrl = () => {
-    const rootUrl = "https://twitter.com/i/oauth2/authorize";
-    const options = {
-      redirect_uri: TWITTER_CALLBACK_URL,
-      client_id: process.env.NEXT_PUBLIC_TWITTER_CLIENT_ID!,
-      state: "state",
-      response_type: "code",
-      code_challenge: "y_SfRG4BmOES02uqWeIkIgLQAlTBggyf_G7uKT51ku8",
-      code_challenge_method: "S256",
-      //👇🏻 required scope for authentication and posting tweets
-      scope: ["users.read", "tweet.read", "tweet.write"].join(" "),
-    };
-    const qs = new URLSearchParams(options).toString();
-    return `${rootUrl}?${qs}`;
-  };
 
   return (
     <nav className="bg-background shadow-sm p-6">
@@ -80,8 +66,8 @@ export default function Navbar() {
             <WalletConnect />
 
             {/* {!!publicKey && ( */}
-            <Link href={getTwitterOauthUrl()}>
-              <Button>Sign in with Twitter</Button>
+            <Link href={"/onboarding"}>
+              <Button>Register as a Creator</Button>
             </Link>
             {/* )} */}
           </div>

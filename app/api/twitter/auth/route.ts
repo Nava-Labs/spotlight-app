@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
       const userCredentials = { ...tokenResponse, ...userDataResponse?.data };
 
       const { error } = await supabase.from("influencers").insert({
+        twitter_id: userDataResponse?.data.id,
         twitter_handle: userDataResponse?.data.username,
         price: 0,
         access_token: userCredentials.access_token,

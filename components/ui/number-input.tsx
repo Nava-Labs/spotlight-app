@@ -1,10 +1,10 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { NumericFormat } from "react-number-format";
+import { NumericFormat, NumericFormatProps } from "react-number-format";
 
-const NumberInput = React.forwardRef<HTMLInputElement, any>(
-  ({ className, type, ...props }) => {
+const NumberInput = React.forwardRef<HTMLInputElement, NumericFormatProps>(
+  ({ className, type, ...props }, ref) => {
     return (
       <NumericFormat
         className={cn(

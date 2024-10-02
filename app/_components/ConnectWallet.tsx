@@ -29,9 +29,9 @@ export default function WalletConnect() {
           <Dialog>
             <DialogTrigger asChild>
               <Button variant={"outline"} className="rounded-full">
-                <p className="text-sm">
+                <pre className="text-xs">
                   {truncateAddress(publicKey.toBase58(), 4)}
-                </p>
+                </pre>
               </Button>
             </DialogTrigger>
             <DialogContent>

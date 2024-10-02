@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default async function Dashboard({
+export default async function TwitterCallbackPage({
   searchParams,
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
@@ -18,5 +18,7 @@ export default async function Dashboard({
   );
   const response = await request.json();
   console.log("RES >>>", response);
-  redirect(`/profile/${response.username}`);
+  redirect(
+    `/onboarding?step=information&user=${response.id}&username=${response.username}`,
+  );
 }
