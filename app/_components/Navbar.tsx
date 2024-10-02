@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import WalletConnect from "./ConnectWallet";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { Button } from "@/components/ui/button";
 import { TWITTER_CALLBACK_URL } from "@/lib/constants";
 
