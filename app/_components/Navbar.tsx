@@ -80,11 +80,11 @@ export default function Navbar() {
           <div className="flex space-x-2">
             <WalletConnect />
 
-            {!!publicKey && (
-              <Link href={getTwitterOauthUrl()}>
-                <Button>Sign in with Twitter</Button>
-              </Link>
-            )}
+            {/* {!!publicKey && ( */}
+            <Link href={getTwitterOauthUrl()}>
+              <Button>Sign in with Twitter</Button>
+            </Link>
+            {/* )} */}
           </div>
         </div>
       </div>

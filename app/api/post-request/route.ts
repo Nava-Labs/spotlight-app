@@ -35,7 +35,7 @@ export const GET = async (req: Request) => {
   if (!influencer) {
     return Response.json(
       {
-        err: "Missing public key!",
+        err: "No creator under given name found",
       },
       {
         status: 400,
