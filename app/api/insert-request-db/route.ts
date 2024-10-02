@@ -104,6 +104,7 @@ async function repostAction(
   //   },
   // );
 
+  console.log(USER_ID, tweet_id);
   const postTweet = await fetch(`https://api.twitter.com/2/tweets`, {
     method: "POST",
     headers: {
