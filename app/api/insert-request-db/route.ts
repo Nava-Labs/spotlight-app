@@ -92,17 +92,26 @@ async function repostAction(
   const USER_ID = "1610013173649924098";
   const tweet_id = new URL(params.details).pathname.split("/")[3];
 
-  const postTweet = await fetch(
-    `https://api.twitter.com/2/users/${USER_ID}/retweets`,
-    {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${influencer.access_token}`,
-      },
-      body: JSON.stringify({ tweet_id: tweet_id }),
+  // const postTweet = await fetch(
+  //   `https://api.twitter.com/2/users/${USER_ID}/retweets`,
+  //   {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-type": "application/json",
+  //       Authorization: `Bearer ${influencer.access_token}`,
+  //     },
+  //     body: JSON.stringify({ tweet_id: tweet_id }),
+  //   },
+  // );
+
+  const postTweet = await fetch(`https://api.twitter.com/2/tweets`, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: `Bearer ${influencer.access_token}`,
     },
-  );
+    body: JSON.stringify({ text: "Testing" }),
+  });
 
   const res = await postTweet.json();
   console.log("RES >>>", res);
