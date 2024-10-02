@@ -1,2 +1,2 @@
 export const TWITTER_CALLBACK_URL =
-  "https://molemoney-web.tunn.dev/callback/twitter";
+  process.env.NEXT_PUBLIC_TWITTER_CALLBACK_URL!;
