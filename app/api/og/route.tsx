@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const fontData = await fetch(
+    new URL("/app/fonts/Manrope-Bold.ttf", import.meta.url),
+  ).then((res) => res.arrayBuffer());
   const spotlightImage = await fetch(
     new URL("/public/Spotlight.jpg", import.meta.url),
   ).then(async (res) => {
@@ -50,22 +53,44 @@ export async function GET(request: NextRequest) {
             objectFit: "cover",
           }}
         />
-        <div tw="flex flex-col justify-center items-center mx-80">
+        <div tw="flex flex-col justify-center items-center mx-80 mt-96">
           <img
             width="800"
             height="800"
             src={`https://pbs.twimg.com/profile_images/1837747151927185408/2C6--z0u_400x400.jpg`}
-            style={{
-              borderRadius: 500,
-            }}
           />
-          <p tw="text-9xl text-white mt-20">x.com/{twitterHandle}</p>
+          <p tw="text-9xl text-white mt-20 ">x.com/{twitterHandle}</p>
+        </div>
+        <div
+          style={{
+            backgroundImage:
+              "linear-gradient(90deg, rgb(121, 40, 202), rgb(255, 0, 128))",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
+            fontSize: "230px",
+            bottom: "500px",
+            fontFamily: "Manrope-SemiBold",
+            position: "absolute",
+            width: "50%",
+            marginLeft: "320px",
+            marginRight: "320px",
+          }}
+        >
+          Social score: 100
         </div>
       </div>
     ),
     {
       width: 4500,
       height: 4500,
+      fonts: [
+        {
+          name: "Manrope",
+          data: fontData,
+          style: "normal",
+        },
+      ],
     },
   );
 }
