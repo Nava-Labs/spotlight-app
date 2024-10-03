@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
   }
 
   const res = await postTweet.json();
-  console.log("RES POSTWEET >>>>", await postTweet.json());
 
   try {
     return NextResponse.json({ ok: true, res }, { status: 200 });
