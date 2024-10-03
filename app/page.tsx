@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -14,9 +15,11 @@ export default function Home() {
           grow their following, and monetize their talent.
         </p>
         <div>
-          <Button className="text-md shadow border border-zinc-700" size="lg">
-            Become a Creator
-          </Button>
+          <Link href="/onboarding">
+            <Button className="text-md shadow border border-zinc-700" size="lg">
+              Become a Creator
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
