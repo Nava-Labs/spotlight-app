@@ -10,7 +10,7 @@ export default function Home() {
           Welcome to Spotlight
         </h1>
         <p className="text-xl text-gray-600 max-w-prose mx-auto">
-          Unleash your creativity and connect with a global audience. CreatorHub
+          Unleash your creativity and connect with a global audience. Spotlight
           is the ultimate platform for content creators to share their passion,
           grow their following, and monetize their talent.
         </p>

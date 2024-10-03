@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -65,23 +65,8 @@ export default function Dashboard() {
     }
   }, [requestsData]);
 
-  const handleDecline = async (id: number, text: string) => {
+  const handleDecline = async (id: number) => {
     startDecline(async () => {
-      const postTweet = await fetch(
-        `https://api.twitter.com/2/users/${influencerData?.twitter_id}/tweets`,
-        {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-            Authorization: `Bearer ${influencerData?.access_token}`,
-          },
-          body: JSON.stringify({ text: text }),
-        },
-      );
-
-      const res = await postTweet.json();
-      if (!res.ok) return;
-
       const { error } = await client
         .from("requests")
         .update({ status: "declined" })
@@ -95,20 +80,39 @@ export default function Dashboard() {
     });
   };
 
-  const handleAccept = async (id: number) => {
-    startAccept(async () => {
-      const { error } = await client
-        .from("requests")
-        .update({ status: "pending" })
-        .eq("id", id);
+  const handleAccept = useCallback(
+    async (id: number, text: string) => {
+      if (!influencerData) return;
+      startAccept(async () => {
+        const postTweet = await fetch(`/api/twitter/post`, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            creator: influencerData.twitter_handle,
+            text: text,
+          }),
+        });
 
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  };
+        if (!postTweet.ok) return;
+        const res = await postTweet.json();
+        console.log(res);
+
+        const { error } = await client
+          .from("requests")
+          .update({ status: "pending" })
+          .eq("id", id);
+
+        if (error) {
+          console.error("Error updating requests:", error);
+        } else {
+          refetchRequests();
+        }
+      });
+    },
+    [influencerData],
+  );
 
   const handleApproved = async (id: number) => {
     startApprove(async () => {
@@ -183,9 +187,7 @@ export default function Dashboard() {
                 {status === "requested" && (
                   <div className="flex space-x-2">
                     <Button
-                      onClick={() =>
-                        handleDecline(request.id, request.details!)
-                      }
+                      onClick={() => handleDecline(request.id)}
                       loading={isDeclining}
                       className="rounded-full"
                       variant={"destructive"}
@@ -194,7 +196,7 @@ export default function Dashboard() {
                       <Trash2Icon className="w-4 h-4 ml-2" />{" "}
                     </Button>
                     <Button
-                      onClick={() => handleAccept(request.id)}
+                      onClick={() => handleAccept(request.id, request.details!)}
                       loading={isAccepting}
                       className="rounded-full"
                     >
@@ -237,7 +239,7 @@ export default function Dashboard() {
           </div>
         </div>
         <Tabs defaultValue="requested" className="w-full mt-6">
-          <TabsList className="grid w-full grid-cols-3 rounded-full p-0">
+          <TabsList className="grid w-full grid-cols-3 rounded-full h-10 p-1">
             <TabsTrigger value="requested" className="rounded-full space-x-2">
               <p>Requested</p>
               {!!requests.filter((req) => req.status === "requested")
