@@ -15,17 +15,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No influencer found" }, { status: 400 });
   }
 
-  const postTweet = await fetch(
-    `https://api.twitter.com/2/users/${influencer.twitter_id}/tweets`,
-    {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-        Authorization: `Bearer ${influencer.access_token}`,
-      },
-      body: JSON.stringify({ text: text }),
+  const postTweet = await fetch(`https://api.twitter.com/2/tweets`, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: `Bearer ${influencer.access_token}`,
     },
-  );
+    body: JSON.stringify({ text: text }),
+  });
 
   console.log(postTweet);
   console.log("RES POSTWEET >>>>", await postTweet.json());
