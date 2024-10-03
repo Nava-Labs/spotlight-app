@@ -54,7 +54,7 @@ export const GET = async (req: Request) => {
     links: {
       actions: [
         {
-          label: `Request & Pay ${influencer.price} SOL`, // button text
+          label: `Request & Pay ${(influencer.price as any).repost} SOL`, // button text
           href: `${requestUrl}&title={title}&details={details}&username={username}`,
           type: "transaction",
           parameters: [
