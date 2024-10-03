@@ -52,6 +52,7 @@ export const GET = async (req: Request) => {
     links: {
       actions: [
         {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           label: `Request & Pay ${(influencer.price as any).post} SOL`, // button text
           href: `${requestUrl}&title={title}&details={details}&username={username}`,
           type: "transaction",

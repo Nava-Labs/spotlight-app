@@ -1,14 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +17,7 @@ import { useParams } from "next/navigation";
 import RequestedEmptyState from "@/public/empty-states/requested.svg";
 import PendingEmptyState from "@/public/empty-states/pending.svg";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
+import { CheckIcon, Trash2Icon } from "lucide-react";
 
 export default function Dashboard() {
   const [requests, setRequests] = useState<ThreadRequest[]>([]);
@@ -33,11 +28,14 @@ export default function Dashboard() {
   const twitterHandle = params.twitter_handle;
 
   const { request, isLoading } = useSpotlightRequest();
+  const [isDeclining, startDecline] = useTransition();
+  const [isAccepting, startAccept] = useTransition();
+  const [isApproving, startApprove] = useTransition();
 
   const { data: influencerData } = useSupabaseQuery(
     client
       .from("influencers")
-      .select("id")
+      .select("*")
       .eq("twitter_handle", twitterHandle)
       .single(),
   );
@@ -66,30 +64,49 @@ export default function Dashboard() {
     }
   }, [requestsData]);
 
-  const handleAccept = async (id: number) => {
-    const { error } = await client
-      .from("requests")
-      .update({ status: "pending" })
-      .eq("id", id);
+  const handleDecline = async (id: number) => {
+    startDecline(async () => {
+      const { error } = await client
+        .from("requests")
+        .update({ status: "declined" })
+        .eq("id", id);
 
-    if (error) {
-      console.error("Error updating requests:", error);
-    } else {
-      refetchRequests();
-    }
+      if (error) {
+        console.error("Error updating requests:", error);
+      } else {
+        refetchRequests();
+      }
+    });
+  };
+
+  const handleAccept = async (id: number) => {
+    startAccept(async () => {
+      const { error } = await client
+        .from("requests")
+        .update({ status: "pending" })
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error updating requests:", error);
+      } else {
+        refetchRequests();
+      }
+    });
   };
 
   const handleApproved = async (id: number) => {
-    const { error } = await client
-      .from("requests")
-      .update({ status: "approved" })
-      .eq("id", id);
+    startApprove(async () => {
+      const { error } = await client
+        .from("requests")
+        .update({ status: "approved" })
+        .eq("id", id);
 
-    if (error) {
-      console.error("Error updating requests:", error);
-    } else {
-      refetchRequests();
-    }
+      if (error) {
+        console.error("Error updating requests:", error);
+      } else {
+        refetchRequests();
+      }
+    });
   };
 
   const renderRequestList = (status: "requested" | "pending" | "approved") => (
@@ -98,18 +115,9 @@ export default function Dashboard() {
         {!requests.filter((req) => req.status === status).length && (
           <Card className="mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md border-none bg-transparent py-6 shadow-none">
             <div className="flex h-full w-fit items-center justify-center">
-              {(() => {
-                switch (status) {
-                  case "requested":
-                    return <RequestedEmptyState />;
-                  case "pending":
-                    return <PendingEmptyState />;
-                  case "approved":
-                    return <ApprovedEmptyState />;
-                  default:
-                    break;
-                }
-              })()}
+              {status === "requested" && <RequestedEmptyState />}
+              {status === "pending" && <PendingEmptyState />}
+              {status === "approved" && <ApprovedEmptyState />}
             </div>
             <p className="text-center text-muted-foreground/50">
               No {status} post found.
@@ -124,11 +132,11 @@ export default function Dashboard() {
                 <div>
                   <h3 className="text-lg font-semibold">{request.title}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {request.request_type}
+                    By {request.requested_by}
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                 {request.details}
               </p>
               <div className="flex justify-between items-center">
@@ -157,16 +165,30 @@ export default function Dashboard() {
                   </DialogContent>
                 </Dialog>
                 {status === "requested" && (
-                  <Button
-                    onClick={() => handleAccept(request.id)}
-                    className="rounded-full"
-                  >
-                    Accept Tweet
-                  </Button>
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => handleDecline(request.id)}
+                      loading={isDeclining}
+                      className="rounded-full"
+                      variant={"destructive"}
+                    >
+                      <p>Decline</p>
+                      <Trash2Icon className="w-4 h-4 ml-2" />{" "}
+                    </Button>
+                    <Button
+                      onClick={() => handleAccept(request.id)}
+                      loading={isAccepting}
+                      className="rounded-full"
+                    >
+                      <p>Accept Tweet</p>
+                      <CheckIcon className="w-4 h-4 ml-2" />{" "}
+                    </Button>
+                  </div>
                 )}
                 {status === "pending" && (
                   <Button
                     onClick={() => handleApproved(request.id)}
+                    loading={isApproving}
                     className="rounded-full"
                   >
                     Approved
@@ -180,12 +202,13 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen bg-background py-4 px-8">
       <div className="max-w-4xl mx-auto">
+        <p className="text-xl font-semibold">@{twitterHandle}</p>
         <p className="text-base text-muted-foreground">
-          Manage and approve thread requests from projects
+          {influencerData?.blinks_description}
         </p>
-        <Tabs defaultValue="requested" className="w-full mt-2">
+        <Tabs defaultValue="requested" className="w-full mt-4">
           <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-muted">
             <TabsTrigger value="requested" className="rounded-full">
               Requested
