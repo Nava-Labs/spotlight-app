@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   console.log("RES POSTWEET >>>>", await postTweet.json());
 
   try {
-    return NextResponse.json({ ok: true }, { status: 200 });
+    return NextResponse.json({ ok: true, res }, { status: 200 });
   } catch (err) {
     console.log(err);
     return NextResponse.json({ error: "An error occurred" }, { status: 400 });
