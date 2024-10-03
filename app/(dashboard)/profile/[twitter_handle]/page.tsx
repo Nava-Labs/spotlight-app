@@ -19,6 +19,7 @@ import PendingEmptyState from "@/public/empty-states/pending.svg";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
 import { CheckIcon, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useSpotlightClaim } from "@/app/claim";
 
 export default function Dashboard() {
   const [requests, setRequests] = useState<ThreadRequest[]>([]);
@@ -28,10 +29,10 @@ export default function Dashboard() {
   const params = useParams();
   const twitterHandle = params.twitter_handle;
 
-  const { request, isLoading } = useSpotlightRequest();
+  const { request, isLoading: isRequestLoading } = useSpotlightRequest();
+  const { claim, isLoading: isClaimLoading } = useSpotlightClaim();
   const [isDeclining, startDecline] = useTransition();
   const [isAccepting, startAccept] = useTransition();
-  const [isApproving, startApprove] = useTransition();
 
   const { data: influencerData } = useSupabaseQuery(
     client
@@ -114,21 +115,6 @@ export default function Dashboard() {
     [influencerData],
   );
 
-  const handleApproved = async (id: number) => {
-    startApprove(async () => {
-      const { error } = await client
-        .from("requests")
-        .update({ status: "approved" })
-        .eq("id", id);
-
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  };
-
   const renderRequestList = (status: "requested" | "pending" | "approved") => (
     <ScrollArea className="h-[600px] pr-4">
       <ul className="space-y-4">
@@ -207,8 +193,10 @@ export default function Dashboard() {
                 )}
                 {status === "pending" && (
                   <Button
-                    onClick={() => handleApproved(request.id)}
-                    loading={isApproving}
+                    onClick={async () =>
+                      await claim(0.001, request.id, refetchRequests)
+                    }
+                    loading={isClaimLoading}
                     className="rounded-full"
                   >
                     Approve
@@ -287,9 +275,9 @@ export default function Dashboard() {
         />
 
         <Button
-          onClick={async () => await request(1)}
+          onClick={async () => await request(0.001)}
           className="w-full"
-          loading={isLoading}
+          loading={isRequestLoading}
           disabled={!wallet.publicKey}
         >
           Request SOL
