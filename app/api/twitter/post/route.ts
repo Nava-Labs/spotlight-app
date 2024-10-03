@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
   });
 
   console.log(postTweet);
-  console.log("RES POSTWEET >>>>", await postTweet.json());
   if (!postTweet.ok) {
     return NextResponse.json(
       { error: postTweet.statusText },
