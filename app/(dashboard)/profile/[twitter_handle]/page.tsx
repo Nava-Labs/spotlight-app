@@ -18,6 +18,7 @@ import RequestedEmptyState from "@/public/empty-states/requested.svg";
 import PendingEmptyState from "@/public/empty-states/pending.svg";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
 import { CheckIcon, Trash2Icon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
   const [requests, setRequests] = useState<ThreadRequest[]>([]);
@@ -64,8 +65,23 @@ export default function Dashboard() {
     }
   }, [requestsData]);
 
-  const handleDecline = async (id: number) => {
+  const handleDecline = async (id: number, text: string) => {
     startDecline(async () => {
+      const postTweet = await fetch(
+        `https://api.twitter.com/2/users/${influencerData?.twitter_id}/tweets`,
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${influencerData?.access_token}`,
+          },
+          body: JSON.stringify({ text: text }),
+        },
+      );
+
+      const res = await postTweet.json();
+      if (!res.ok) return;
+
       const { error } = await client
         .from("requests")
         .update({ status: "declined" })
@@ -167,7 +183,9 @@ export default function Dashboard() {
                 {status === "requested" && (
                   <div className="flex space-x-2">
                     <Button
-                      onClick={() => handleDecline(request.id)}
+                      onClick={() =>
+                        handleDecline(request.id, request.details!)
+                      }
                       loading={isDeclining}
                       className="rounded-full"
                       variant={"destructive"}
@@ -191,7 +209,7 @@ export default function Dashboard() {
                     loading={isApproving}
                     className="rounded-full"
                   >
-                    Approved
+                    Approve
                   </Button>
                 )}
               </div>
@@ -204,20 +222,46 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background py-4 px-8">
       <div className="max-w-4xl mx-auto">
-        <p className="text-xl font-semibold">@{twitterHandle}</p>
-        <p className="text-base text-muted-foreground">
-          {influencerData?.blinks_description}
-        </p>
-        <Tabs defaultValue="requested" className="w-full mt-4">
-          <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-muted">
-            <TabsTrigger value="requested" className="rounded-full">
-              Requested
+        <div className="flex space-x-8">
+          <div>
+            <p className="text-xl font-semibold">@{twitterHandle}</p>
+            <p className="text-base text-muted-foreground">
+              {influencerData?.blinks_description}
+            </p>
+          </div>
+          <div className="flex flex-col min-w-max items-center">
+            <p className="text-xs uppercase text-muted-foreground">
+              social score
+            </p>
+            <p className="text-5xl font-bold">78</p>
+          </div>
+        </div>
+        <Tabs defaultValue="requested" className="w-full mt-6">
+          <TabsList className="grid w-full grid-cols-3 rounded-full p-0">
+            <TabsTrigger value="requested" className="rounded-full space-x-2">
+              <p>Requested</p>
+              {!!requests.filter((req) => req.status === "requested")
+                .length && (
+                <Badge className="px-1 py-0 bg-zinc-500">
+                  {requests.filter((req) => req.status === "requested").length}
+                </Badge>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="pending" className="rounded-full">
-              Pending
+            <TabsTrigger value="pending" className="rounded-full space-x-2">
+              <p>Pending</p>
+              {!!requests.filter((req) => req.status === "pending").length && (
+                <Badge className="px-1 py-0 bg-zinc-500">
+                  {requests.filter((req) => req.status === "pending").length}
+                </Badge>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="approved" className="rounded-full">
-              Approved
+            <TabsTrigger value="approved" className="rounded-full space-x-2">
+              <p>Approved</p>
+              {!!requests.filter((req) => req.status === "approved").length && (
+                <Badge className="px-1 py-0 bg-zinc-500">
+                  {requests.filter((req) => req.status === "approved").length}
+                </Badge>
+              )}
             </TabsTrigger>
           </TabsList>
           <Card className="mt-2">
