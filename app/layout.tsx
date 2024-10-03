@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import SolanaWalletProvider from "./providers";
-import Navbar from "./_components/Navbar";
-import { ReactQueryClientProvider } from "@/components/QueryProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,17 +24,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ReactQueryClientProvider>
       <html lang="en">
-        <SolanaWalletProvider>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
           >
-            <Navbar />
             {children}
           </body>
-        </SolanaWalletProvider>
       </html>
-    </ReactQueryClientProvider>
   );
 }

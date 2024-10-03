@@ -1,12 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import WalletConnect from "./ConnectWallet";
-import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
-  // const { publicKey } = useWallet();
-
   return (
     <nav className="bg-background shadow-sm p-6">
       <div className="max-w-4xl mx-auto">
@@ -61,12 +57,6 @@ export default function Navbar() {
           </svg>
           <div className="flex space-x-2">
             <WalletConnect />
-
-            {/* {!!publicKey && ( */}
-            <Link href={"/onboarding"}>
-              <Button>Register as a Creator</Button>
-            </Link>
-            {/* )} */}
           </div>
         </div>
       </div>

@@ -20,6 +20,10 @@ import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useParams } from "next/navigation";
 
+import RequestedEmptyState from "@/public/empty-states/requested.svg";
+import PendingEmptyState from "@/public/empty-states/pending.svg";
+import ApprovedEmptyState from "@/public/empty-states/approved.svg";
+
 export default function Dashboard() {
   const [requests, setRequests] = useState<ThreadRequest[]>([]);
   const wallet = useWallet();
@@ -91,6 +95,27 @@ export default function Dashboard() {
   const renderRequestList = (status: "requested" | "pending" | "approved") => (
     <ScrollArea className="h-[600px] pr-4">
       <ul className="space-y-4">
+        {!requests.filter((req) => req.status === status).length && (
+          <Card className="mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md border-none bg-transparent py-6 shadow-none">
+            <div className="flex h-full w-fit items-center justify-center">
+              {(() => {
+                switch (status) {
+                  case "requested":
+                    return <RequestedEmptyState />;
+                  case "pending":
+                    return <PendingEmptyState />;
+                  case "approved":
+                    return <ApprovedEmptyState />;
+                  default:
+                    break;
+                }
+              })()}
+            </div>
+            <p className="text-center text-muted-foreground/50">
+              No {status} post found.
+            </p>
+          </Card>
+        )}
         {requests
           .filter((req) => req.status === status)
           .map((request) => (
@@ -178,13 +203,22 @@ export default function Dashboard() {
                 Approved
               </TabsTrigger>
             </TabsList>
-            <TabsContent value="requested">
+            <TabsContent
+              value="requested"
+              className="bg-zinc-50 rounded-lg shadow-inner"
+            >
               {renderRequestList("requested")}
             </TabsContent>
-            <TabsContent value="pending">
+            <TabsContent
+              value="pending"
+              className="bg-zinc-50 rounded-lg shadow-inner"
+            >
               {renderRequestList("pending")}
             </TabsContent>
-            <TabsContent value="approved">
+            <TabsContent
+              value="approved"
+              className="bg-zinc-50 rounded-lg shadow-inner"
+            >
               {renderRequestList("approved")}
             </TabsContent>
           </Tabs>
