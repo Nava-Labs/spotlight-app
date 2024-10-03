@@ -181,65 +181,51 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background p-8">
-      <Card className="max-w-4xl mx-auto rounded-xl shadow-lg">
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <CardTitle className="text-2xl"></CardTitle>
-          </div>
-          <CardDescription className="text-base">
-            Manage and approve thread requests from projects
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="requested" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-muted">
-              <TabsTrigger value="requested" className="rounded-full">
-                Requested
-              </TabsTrigger>
-              <TabsTrigger value="pending" className="rounded-full">
-                Pending
-              </TabsTrigger>
-              <TabsTrigger value="approved" className="rounded-full">
-                Approved
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent
-              value="requested"
-              className="bg-zinc-50 rounded-lg shadow-inner"
-            >
-              {renderRequestList("requested")}
+      <div className="max-w-4xl mx-auto">
+        <p className="text-base text-muted-foreground">
+          Manage and approve thread requests from projects
+        </p>
+        <Tabs defaultValue="requested" className="w-full mt-2">
+          <TabsList className="grid w-full grid-cols-3 rounded-full p-1 bg-muted">
+            <TabsTrigger value="requested" className="rounded-full">
+              Requested
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="rounded-full">
+              Pending
+            </TabsTrigger>
+            <TabsTrigger value="approved" className="rounded-full">
+              Approved
+            </TabsTrigger>
+          </TabsList>
+          <Card className="mt-2">
+            <TabsContent value="requested">
+              <CardContent>{renderRequestList("requested")}</CardContent>
             </TabsContent>
-            <TabsContent
-              value="pending"
-              className="bg-zinc-50 rounded-lg shadow-inner"
-            >
-              {renderRequestList("pending")}
+            <TabsContent value="pending">
+              <CardContent>{renderRequestList("pending")}</CardContent>
             </TabsContent>
-            <TabsContent
-              value="approved"
-              className="bg-zinc-50 rounded-lg shadow-inner"
-            >
-              {renderRequestList("approved")}
+            <TabsContent value="approved">
+              <CardContent>{renderRequestList("approved")}</CardContent>
             </TabsContent>
-          </Tabs>
-          <input
-            type="number"
-            placeholder="Amount in SOL"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="w-full"
-          />
+          </Card>
+        </Tabs>
+        <input
+          type="number"
+          placeholder="Amount in SOL"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="w-full mt-8"
+        />
 
-          <Button
-            onClick={async () => await request(1)}
-            className="w-full"
-            loading={isLoading}
-            disabled={!wallet.publicKey}
-          >
-            Request SOL
-          </Button>
-        </CardContent>
-      </Card>
+        <Button
+          onClick={async () => await request(1)}
+          className="w-full"
+          loading={isLoading}
+          disabled={!wallet.publicKey}
+        >
+          Request SOL
+        </Button>
+      </div>
     </div>
   );
 }
