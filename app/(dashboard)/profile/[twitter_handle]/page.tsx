@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useSpotlightRequest } from "../../request";
+import { useSpotlightRequest } from "../../../request";
 import { ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
