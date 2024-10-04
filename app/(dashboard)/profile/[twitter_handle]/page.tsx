@@ -178,6 +178,7 @@ const ProjectView = ({
 }: {
   requests: ThreadRequest[];
   influencerData: Influencers;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
   const client = useSupabaseBrowser();
@@ -321,6 +322,7 @@ const InfluencerView = ({
 }: {
   requests: ThreadRequest[];
   influencerData: Influencers;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
   const wallet = useWallet();
