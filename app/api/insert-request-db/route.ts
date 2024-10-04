@@ -94,11 +94,10 @@ async function repostAction(
   params: ReturnType<typeof validatedQueryParams>,
   influencer: Influencer,
 ) {
-  const USER_ID = "1610013173649924098";
   const tweet_id = new URL(params.details).pathname.split("/")[3];
 
   const postTweet = await fetch(
-    `https://api.twitter.com/2/users/${USER_ID}/retweets`,
+    `https://api.twitter.com/2/users/${influencer.twitter_id}/retweets`,
     {
       method: "POST",
       headers: {
