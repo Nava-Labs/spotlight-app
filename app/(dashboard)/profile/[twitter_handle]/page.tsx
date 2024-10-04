@@ -33,6 +33,7 @@ import ApprovedEmptyState from "@/public/empty-states/approved.svg";
 import { CheckIcon, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import WalletConnect from "@/app/_components/ConnectWallet";
+import { useSpotlightClaim } from "@/app/claim";
 
 export default function Dashboard() {
   const wallet = useWallet();
@@ -181,23 +182,7 @@ const ProjectView = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
-  const client = useSupabaseBrowser();
-  const [isApproving, startApprove] = useTransition();
-
-  const handleApproved = async (id: number) => {
-    startApprove(async () => {
-      const { error } = await client
-        .from("requests")
-        .update({ status: "approved" })
-        .eq("id", id);
-
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  };
+  const { claim: handleApprove, isLoading: isApproving } = useSpotlightClaim();
 
   return (
     <Card className="mt-6">
@@ -262,11 +247,16 @@ const ProjectView = ({
                     <div className="flex space-x-2">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button className="rounded-full">Approve</Button>
+                          <Button className="rounded-full">
+                            <p>Approve work</p>
+                            <CheckIcon className="w-4 h-4 ml-2" />{" "}
+                          </Button>
                         </DialogTrigger>
                         <DialogContent className="rounded-xl">
                           <DialogHeader>
-                            <DialogTitle>Approve thread?</DialogTitle>
+                            <DialogTitle>
+                              Approve this creator&apos;s work?
+                            </DialogTitle>
                           </DialogHeader>
                           <div className="text-muted-foreground">
                             By Approving this thread. You will transfer your
@@ -284,7 +274,13 @@ const ProjectView = ({
                               </Button>
                             </DialogClose>
                             <Button
-                              onClick={() => handleApproved(request.id)}
+                              onClick={async () =>
+                                await handleApprove(
+                                  0.01,
+                                  request.id,
+                                  refetchRequests,
+                                )
+                              }
                               loading={isApproving}
                               className="rounded-full"
                             >

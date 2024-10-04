@@ -11,6 +11,7 @@ import invariant from "tiny-invariant";
 import bs58 from "bs58";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 
+// FIX: This need to be done in the server. Not client!
 export function useSpotlightClaim() {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
