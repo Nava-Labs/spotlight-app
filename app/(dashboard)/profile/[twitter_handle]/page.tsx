@@ -1,15 +1,28 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSpotlightRequest } from "../../../request";
-import { ThreadRequest } from "@/types";
+import { Influencers, ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useParams } from "next/navigation";
@@ -17,21 +30,24 @@ import { useParams } from "next/navigation";
 import RequestedEmptyState from "@/public/empty-states/requested.svg";
 import PendingEmptyState from "@/public/empty-states/pending.svg";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
-import { CheckIcon, Trash2Icon } from "lucide-react";
+import { CheckIcon, CircleHelp, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Database } from "@/database.types";
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
+import { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js";
+import WalletConnect from "@/app/_components/ConnectWallet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Dashboard() {
-  const [requests, setRequests] = useState<ThreadRequest[]>([]);
   const wallet = useWallet();
-  const [amount, setAmount] = useState("");
   const client = useSupabaseBrowser();
   const params = useParams();
   const twitterHandle = params.twitter_handle;
-
-  const { request, isLoading } = useSpotlightRequest();
-  const [isDeclining, startDecline] = useTransition();
-  const [isAccepting, startAccept] = useTransition();
-  const [isApproving, startApprove] = useTransition();
 
   const { data: influencerData } = useSupabaseQuery(
     client
@@ -41,12 +57,19 @@ export default function Dashboard() {
       .single(),
   );
 
+  const isInfluencer = useMemo(() => {
+    if (!influencerData) return false;
+    if (!wallet.publicKey) return false;
+    return wallet.publicKey.toString() === influencerData.public_key;
+  }, [wallet, influencerData]);
+
   const { data: requestsData, refetch: refetchRequests } = useSupabaseQuery(
     client
       .from("requests")
-      .select("*")
-      .eq("influencer_id", influencerData?.id ?? ""),
-    { enabled: !!influencerData },
+      .select("*, influencer:influencers(twitter_handle)")
+      .eq("influencer_id", influencerData?.id ?? "")
+      .eq("public_key", wallet.publicKey?.toString() ?? ""),
+    { enabled: !!influencerData || !!wallet.publicKey },
   );
 
   useEffect(() => {
@@ -55,15 +78,245 @@ export default function Dashboard() {
     }
   }, [wallet.publicKey]);
 
-  useEffect(() => {
-    if (requestsData) {
-      const threadRequests: ThreadRequest[] = requestsData.map((collab) => ({
-        ...collab,
-      }));
+  if (!influencerData || !wallet.publicKey || !requestsData) {
+    return (
+      <div className="min-h-screen bg-background py-4 px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex space-x-8">
+            <div>
+              <p className="text-xl font-semibold">@{twitterHandle}</p>
+              <p className="text-base text-muted-foreground">
+                {influencerData?.blinks_description}
+              </p>
+            </div>
+            <div className="flex flex-col min-w-max items-center">
+              <p className="text-xs uppercase text-muted-foreground">
+                social score
+              </p>
+              <p className="text-5xl font-bold">78</p>
+            </div>
+          </div>
+          <WalletConnect />
+        </div>
+      </div>
+    );
+  }
 
-      setRequests(threadRequests);
-    }
-  }, [requestsData]);
+  if (!isInfluencer) {
+    return (
+      <div className="min-h-screen bg-background py-4 px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex space-x-8">
+            <div>
+              <p className="text-xl font-semibold">@{twitterHandle}</p>
+              <p className="text-base text-muted-foreground">
+                {influencerData.blinks_description}
+              </p>
+            </div>
+            <div className="flex flex-col min-w-max items-center">
+              <p className="text-xs uppercase text-muted-foreground">
+                social score
+              </p>
+              <p className="text-5xl font-bold">78</p>
+            </div>
+          </div>
+          <ProjectView
+            requests={requestsData}
+            influencerData={influencerData}
+            refetchRequests={refetchRequests}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background py-4 px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex space-x-8">
+          <div>
+            <p className="text-xl font-semibold">@{twitterHandle}</p>
+            <p className="text-base text-muted-foreground">
+              {influencerData?.blinks_description}
+            </p>
+          </div>
+          <div className="flex flex-col min-w-max items-center">
+            <p className="text-xs uppercase text-muted-foreground">
+              social score
+            </p>
+            <p className="text-5xl font-bold">78</p>
+          </div>
+        </div>
+        <InfluencerView
+          requests={requestsData}
+          influencerData={influencerData}
+          refetchRequests={refetchRequests}
+        />
+      </div>
+    </div>
+  );
+}
+
+const ProjectView = ({
+  requests,
+  influencerData,
+  refetchRequests,
+}: {
+  requests: ThreadRequest[];
+  influencerData: Influencers;
+  refetchRequests: () => Promise<any>;
+}) => {
+  const client = useSupabaseBrowser();
+  const [isApproving, startApprove] = useTransition();
+
+  const handleApproved = async (id: number) => {
+    startApprove(async () => {
+      const { error } = await client
+        .from("requests")
+        .update({ status: "approved" })
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error updating requests:", error);
+      } else {
+        refetchRequests();
+      }
+    });
+  };
+
+  return (
+    <Card className="mt-6">
+      <CardContent className="py-4">
+        <ScrollArea className="h-[600px] pr-4">
+          <ul className="space-y-4">
+            {!requests.length && (
+              <Card className="mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md border-none bg-transparent py-6 shadow-none">
+                <div className="flex h-full w-fit items-center justify-center">
+                  <ApprovedEmptyState />
+                </div>
+                <p className="text-center text-muted-foreground/50">
+                  You have no tweet request for this Creator.
+                </p>
+              </Card>
+            )}
+            {requests.map((request) => (
+              <li key={request.id} className="bg-card rounded-xl p-4 shadow-sm">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="text-lg font-semibold">{request.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Requested to @{request.influencer?.twitter_handle}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                  {request.details}
+                </p>
+                <div className="flex justify-between items-center">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="rounded-full">
+                        View Details
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="rounded-xl">
+                      <div className="mt-4">
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {request.details}
+                        </p>
+                        <div className="flex justify-end space-x-2">
+                          <DialogClose asChild>
+                            <Button variant="outline" className="rounded-full">
+                              Close
+                            </Button>
+                          </DialogClose>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  {request.status === "requested" && (
+                    <Button
+                      disabled
+                      variant={"outline"}
+                      className="rounded-full"
+                    >
+                      Waiting for approval..
+                    </Button>
+                  )}
+                  {request.status === "pending" && (
+                    <div className="flex space-x-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button className="rounded-full">Approve</Button>
+                        </DialogTrigger>
+                        <DialogContent className="rounded-xl">
+                          <DialogHeader>
+                            <DialogTitle>Approve thread?</DialogTitle>
+                          </DialogHeader>
+                          <div className="text-muted-foreground">
+                            By Approving this thread. You will transfer your
+                            funds to @{request.influencer?.twitter_handle}{" "}
+                            wallet. Make sure the fulfilled request is
+                            acceptable to avoid unwanted outcome.
+                          </div>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button
+                                variant={"outline"}
+                                className="rounded-full"
+                              >
+                                Cancel
+                              </Button>
+                            </DialogClose>
+                            <Button
+                              onClick={() => handleApproved(request.id)}
+                              loading={isApproving}
+                              className="rounded-full"
+                            >
+                              Proceed transfer
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  )}
+                  {request.status === "approved" && (
+                    <Button
+                      disabled
+                      loading={isApproving}
+                      className="rounded-full bg-green-600"
+                    >
+                      <p>Approved</p>
+                      <CheckIcon className="w-4 h-4 ml-2" />{" "}
+                    </Button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
+      </CardContent>
+    </Card>
+  );
+};
+
+const InfluencerView = ({
+  requests,
+  influencerData,
+  refetchRequests,
+}: {
+  requests: ThreadRequest[];
+  influencerData: Influencers;
+  refetchRequests: () => Promise<any>;
+}) => {
+  const wallet = useWallet();
+  const client = useSupabaseBrowser();
+
+  const [isDeclining, startDecline] = useTransition();
+  const [isAccepting, startAccept] = useTransition();
+  const [amount, setAmount] = useState("");
+
+  const { request, isLoading } = useSpotlightRequest();
 
   const handleDecline = async (id: number) => {
     startDecline(async () => {
@@ -113,21 +366,6 @@ export default function Dashboard() {
     },
     [influencerData],
   );
-
-  const handleApproved = async (id: number) => {
-    startApprove(async () => {
-      const { error } = await client
-        .from("requests")
-        .update({ status: "approved" })
-        .eq("id", id);
-
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  };
 
   const renderRequestList = (status: "requested" | "pending" | "approved") => (
     <ScrollArea className="h-[600px] pr-4">
@@ -206,12 +444,15 @@ export default function Dashboard() {
                   </div>
                 )}
                 {status === "pending" && (
-                  <Button
-                    onClick={() => handleApproved(request.id)}
-                    loading={isApproving}
-                    className="rounded-full"
-                  >
-                    Approve
+                  <Button disabled className="rounded-full">
+                    <p>Pending approval...</p>
+                    <CheckIcon className="w-4 h-4 ml-2" />{" "}
+                  </Button>
+                )}
+                {status === "approved" && (
+                  <Button disabled className="rounded-full bg-green-600">
+                    <p>Payment Received</p>
+                    <CheckIcon className="w-4 h-4 ml-2" />{" "}
                   </Button>
                 )}
               </div>
@@ -222,79 +463,62 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-background py-4 px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex space-x-8">
-          <div>
-            <p className="text-xl font-semibold">@{twitterHandle}</p>
-            <p className="text-base text-muted-foreground">
-              {influencerData?.blinks_description}
-            </p>
-          </div>
-          <div className="flex flex-col min-w-max items-center">
-            <p className="text-xs uppercase text-muted-foreground">
-              social score
-            </p>
-            <p className="text-5xl font-bold">78</p>
-          </div>
-        </div>
-        <Tabs defaultValue="requested" className="w-full mt-6">
-          <TabsList className="grid w-full grid-cols-3 rounded-full h-10 p-1">
-            <TabsTrigger value="requested" className="rounded-full space-x-2">
-              <p>Requested</p>
-              {!!requests.filter((req) => req.status === "requested")
-                .length && (
-                <Badge className="px-1 py-0 bg-zinc-500">
-                  {requests.filter((req) => req.status === "requested").length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="pending" className="rounded-full space-x-2">
-              <p>Pending</p>
-              {!!requests.filter((req) => req.status === "pending").length && (
-                <Badge className="px-1 py-0 bg-zinc-500">
-                  {requests.filter((req) => req.status === "pending").length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="approved" className="rounded-full space-x-2">
-              <p>Approved</p>
-              {!!requests.filter((req) => req.status === "approved").length && (
-                <Badge className="px-1 py-0 bg-zinc-500">
-                  {requests.filter((req) => req.status === "approved").length}
-                </Badge>
-              )}
-            </TabsTrigger>
-          </TabsList>
-          <Card className="mt-2">
-            <TabsContent value="requested">
-              <CardContent>{renderRequestList("requested")}</CardContent>
-            </TabsContent>
-            <TabsContent value="pending">
-              <CardContent>{renderRequestList("pending")}</CardContent>
-            </TabsContent>
-            <TabsContent value="approved">
-              <CardContent>{renderRequestList("approved")}</CardContent>
-            </TabsContent>
-          </Card>
-        </Tabs>
-        <input
-          type="number"
-          placeholder="Amount in SOL"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full mt-8"
-        />
+    <>
+      <Tabs defaultValue="requested" className="w-full mt-6">
+        <TabsList className="grid w-full grid-cols-3 rounded-full h-10 p-1">
+          <TabsTrigger value="requested" className="rounded-full space-x-2">
+            <p>Requested</p>
+            {!!requests.filter((req) => req.status === "requested").length && (
+              <Badge className="px-1 py-0 bg-zinc-500">
+                {requests.filter((req) => req.status === "requested").length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="pending" className="rounded-full space-x-2">
+            <p>Pending</p>
+            {!!requests.filter((req) => req.status === "pending").length && (
+              <Badge className="px-1 py-0 bg-zinc-500">
+                {requests.filter((req) => req.status === "pending").length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="approved" className="rounded-full space-x-2">
+            <p>Approved</p>
+            {!!requests.filter((req) => req.status === "approved").length && (
+              <Badge className="px-1 py-0 bg-zinc-500">
+                {requests.filter((req) => req.status === "approved").length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+        <Card className="mt-2">
+          <TabsContent value="requested">
+            <CardContent>{renderRequestList("requested")}</CardContent>
+          </TabsContent>
+          <TabsContent value="pending">
+            <CardContent>{renderRequestList("pending")}</CardContent>
+          </TabsContent>
+          <TabsContent value="approved">
+            <CardContent>{renderRequestList("approved")}</CardContent>
+          </TabsContent>
+        </Card>
+      </Tabs>
+      <input
+        type="number"
+        placeholder="Amount in SOL"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        className="w-full mt-8"
+      />
 
-        <Button
-          onClick={async () => await request(1)}
-          className="w-full"
-          loading={isLoading}
-          disabled={!wallet.publicKey}
-        >
-          Request SOL
-        </Button>
-      </div>
-    </div>
+      <Button
+        onClick={async () => await request(1)}
+        className="w-full"
+        loading={isLoading}
+        disabled={!wallet.publicKey}
+      >
+        Request SOL
+      </Button>
+    </>
   );
-}
+};

@@ -1,22 +1,8 @@
-export type Requests = {
-  id: number;
-  influencer_id: number;
-  status: string;
-  user_id: number;
-  deal_expiry_date: string;
-  details: string;
-  request_type: string;
-};
+import { Database } from "@/database.types";
 
-export type Influencers = {
-  id: number;
-  twitter_handle: string;
-  social_score: number;
-  blinks_title: string;
-  blinks_description: string;
-  user_id: number;
-  access_token: string;
-};
+export type Requests = Database["public"]["Tables"]["requests"]["Row"];
+
+export type Influencers = Database["public"]["Tables"]["influencers"]["Row"];
 
 export type User = {
   id: number;
@@ -32,4 +18,5 @@ export type ThreadRequest = {
   details?: string | null;
   deal_expiry_date?: string | null;
   influencer_id?: number | null;
+  influencer: Pick<Influencers, "twitter_handle"> | null;
 };
