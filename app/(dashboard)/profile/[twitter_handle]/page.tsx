@@ -188,7 +188,23 @@ const ProjectView = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
-  const { claim: handleApprove, isLoading: isApproving } = useSpotlightClaim();
+  const client = useSupabaseBrowser();
+  const [isApproving, startApprove] = useTransition();
+
+  const handleApprove = async (id: number) => {
+    startApprove(async () => {
+      const { error } = await client
+        .from("requests")
+        .update({ status: "approved" })
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error updating requests:", error);
+      } else {
+        refetchRequests();
+      }
+    });
+  };
 
   return (
     <Card className="mt-6">
@@ -281,11 +297,7 @@ const ProjectView = ({
                             </DialogClose>
                             <Button
                               onClick={async () =>
-                                await handleApprove(
-                                  0.01,
-                                  request.id,
-                                  refetchRequests,
-                                )
+                                await handleApprove(request.id)
                               }
                               loading={isApproving}
                               className="rounded-full"
@@ -335,6 +347,7 @@ const InfluencerView = ({
   const [amount, setAmount] = useState("");
 
   const { request, isLoading } = useSpotlightRequest();
+  const { claim: handleClaim, isLoading: isClaiming } = useSpotlightClaim();
 
   const handleDecline = async (id: number) => {
     startDecline(async () => {
@@ -468,8 +481,14 @@ const InfluencerView = ({
                   </Button>
                 )}
                 {status === "approved" && (
-                  <Button disabled className="rounded-full bg-green-600">
-                    <p>Payment Received</p>
+                  <Button
+                    onClick={async () =>
+                      await handleClaim(0.01, request.id, refetchRequests)
+                    }
+                    loading={isClaiming}
+                    className="rounded-full bg-green-600"
+                  >
+                    <p>Claim Payment</p>
                     <CheckIcon className="w-4 h-4 ml-2" />{" "}
                   </Button>
                 )}
