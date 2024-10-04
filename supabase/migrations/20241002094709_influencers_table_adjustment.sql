@@ -9,4 +9,6 @@ alter table "public"."requests" add constraint "requests_status_check" CHECK ((s
 
 alter table "public"."requests" validate constraint "requests_status_check";
 
+alter table "public"."requests" add column "tx_receipt" text;
+alter table "public"."requests" add column "tweet_link" text;
 

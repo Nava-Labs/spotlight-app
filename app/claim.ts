@@ -54,7 +54,7 @@ export function useSpotlightClaim() {
           if (signature) {
             const { error } = await client
               .from("requests")
-              .update({ status: "approved" })
+              .update({ status: "approved", tx_receipt: signature })
               .eq("id", id);
 
             if (error) {
