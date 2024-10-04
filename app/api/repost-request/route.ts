@@ -24,6 +24,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server-client";
 export const GET = async (req: Request) => {
   const requestUrl = new URL(req.url);
   const { creator } = validatedQueryParams(requestUrl);
+  const baseUrl = new URL(req.url).origin;
 
   const supabaseClient = getSupabaseServerClient();
   const { data: influencer } = await supabaseClient
@@ -46,7 +47,7 @@ export const GET = async (req: Request) => {
 
   const payload: ActionGetResponse = {
     icon: new URL(
-      `/api/og/?twitter_handle=${influencer.twitter_handle}`,
+      `${baseUrl}/api/og?twitter_handle=${influencer.twitter_handle}`,
       new URL(req.url).origin,
     ).toString(),
     label: "Request & Pay 0.001 SOL", // this value will be ignored since `links.actions` exists
