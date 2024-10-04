@@ -55,12 +55,18 @@ export default function Dashboard() {
     return wallet.publicKey.toString() === influencerData.public_key;
   }, [wallet, influencerData]);
 
-  const { data: requestsData, refetch: refetchRequests } = useSupabaseQuery(
-    client
+  const getRequestsQuery = useCallback(() => {
+    const base = client
       .from("requests")
       .select("*, influencer:influencers(twitter_handle)")
-      .eq("influencer_id", influencerData?.id ?? "")
-      .eq("public_key", wallet.publicKey?.toString() ?? ""),
+      .eq("influencer_id", influencerData?.id ?? "");
+    if (isInfluencer) return base;
+
+    return base.eq("public_key", wallet.publicKey ?? "");
+  }, [influencerData, wallet, isInfluencer, client]);
+
+  const { data: requestsData, refetch: refetchRequests } = useSupabaseQuery(
+    getRequestsQuery(),
     { enabled: !!influencerData || !!wallet.publicKey },
   );
 
