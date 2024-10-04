@@ -8,7 +8,7 @@ import {
   useTransition,
 } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -30,18 +30,9 @@ import { useParams } from "next/navigation";
 import RequestedEmptyState from "@/public/empty-states/requested.svg";
 import PendingEmptyState from "@/public/empty-states/pending.svg";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
-import { CheckIcon, CircleHelp, Trash2Icon } from "lucide-react";
+import { CheckIcon, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Database } from "@/database.types";
-import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
-import { PostgrestError, PostgrestSingleResponse } from "@supabase/supabase-js";
 import WalletConnect from "@/app/_components/ConnectWallet";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export default function Dashboard() {
   const wallet = useWallet();
@@ -96,7 +87,30 @@ export default function Dashboard() {
               <p className="text-5xl font-bold">78</p>
             </div>
           </div>
-          <WalletConnect />
+          <Card className="relative mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md bg-transparent py-6 overflow-hidden">
+            <div className="flex h-full w-fit items-center justify-center">
+              <ApprovedEmptyState />
+            </div>
+            <p className="text-center text-muted-foreground/50">
+              You have no tweet request for ...
+            </p>
+            <div className="flex h-full w-fit items-center justify-center">
+              <ApprovedEmptyState />
+            </div>
+            <p className="text-center text-muted-foreground/50">
+              You have no tweet request for ...
+            </p>
+            <div className="flex h-full w-fit items-center justify-center">
+              <ApprovedEmptyState />
+            </div>
+            <p className="text-center text-muted-foreground/50">
+              You have no tweet request for ...
+            </p>
+
+            <div className="absolute top-0 w-full h-full flex items-center justify-center bg-white/5 backdrop-blur-lg">
+              <WalletConnect />
+            </div>
+          </Card>
         </div>
       </div>
     );
@@ -195,7 +209,7 @@ const ProjectView = ({
                   <ApprovedEmptyState />
                 </div>
                 <p className="text-center text-muted-foreground/50">
-                  You have no tweet request for this Creator.
+                  You have no tweet request for @{influencerData.twitter_handle}
                 </p>
               </Card>
             )}
