@@ -41,7 +41,7 @@ export default function Dashboard() {
   const params = useParams();
   const twitterHandle = params.twitter_handle;
 
-  const { data: influencerData } = useSupabaseQuery(
+  const { data: influencerData, refetch: refetchInfluencer } = useSupabaseQuery(
     client
       .from("influencers")
       .select("*")
@@ -171,7 +171,10 @@ export default function Dashboard() {
         <InfluencerView
           requests={requestsData}
           influencerData={influencerData}
-          refetchRequests={refetchRequests}
+          refetchRequests={async () => {
+            await refetchRequests();
+            await refetchInfluencer();
+          }}
         />
       </div>
     </div>
@@ -486,6 +489,7 @@ const InfluencerView = ({
                       await handleClaim(0.01, request.id, refetchRequests)
                     }
                     loading={isClaiming}
+                    disabled={!!request.tx_receipt}
                     className="rounded-full bg-green-600"
                   >
                     <p>Claim Payment</p>

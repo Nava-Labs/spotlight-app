@@ -9,14 +9,6 @@ export type User = {
   public_key: string;
 };
 
-export type ThreadRequest = {
-  id: number;
-  status: string;
-  request_type: string;
-  requested_by: string;
-  title: string;
-  details?: string | null;
-  deal_expiry_date?: string | null;
-  influencer_id?: number | null;
+export type ThreadRequest = Requests & {
   influencer: Pick<Influencers, "twitter_handle"> | null;
 };
