@@ -1,25 +1,9 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DialogClose } from "@radix-ui/react-dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSpotlightRequest } from "../../../request";
 import { Influencers, ThreadRequest } from "@/types";
@@ -27,15 +11,11 @@ import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useParams } from "next/navigation";
 
-import RequestedEmptyState from "@/public/empty-states/requested.svg";
-import PendingEmptyState from "@/public/empty-states/pending.svg";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
-import { CheckIcon, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import WalletConnect from "@/app/_components/ConnectWallet";
-import { useSpotlightClaim } from "@/app/claim";
-import RequestList from './RequestList';
-import ProjectRequestList from './ProjectRequestList';
+import RequestList from "./_components/RequestList";
+import ProjectRequestList from "./_components/ProjectRequestList";
 
 export default function Dashboard() {
   const wallet = useWallet();
@@ -189,6 +169,7 @@ const ProjectView = ({
 }: {
   requests: ThreadRequest[];
   influencerData: Influencers;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
   return (
@@ -211,6 +192,7 @@ const InfluencerView = ({
 }: {
   requests: ThreadRequest[];
   influencerData: Influencers;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
   const wallet = useWallet();

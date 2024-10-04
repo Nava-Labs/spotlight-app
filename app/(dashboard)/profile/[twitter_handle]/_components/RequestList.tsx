@@ -1,8 +1,8 @@
-import React from 'react';
+import React from "react";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThreadRequest, RequestStatus } from "@/types";
-import RequestListItem from './RequestListItem';
+import RequestListItem from "./RequestListItem";
 import RequestedEmptyState from "@/public/empty-states/requested.svg";
 import PendingEmptyState from "@/public/empty-states/pending.svg";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
@@ -10,6 +10,7 @@ import ApprovedEmptyState from "@/public/empty-states/approved.svg";
 interface RequestListProps {
   requests: ThreadRequest[];
   status: RequestStatus;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
   influencerTwitterHandle?: string;
 }
@@ -52,3 +53,4 @@ const RequestList: React.FC<RequestListProps> = ({
 };
 
 export default RequestList;
+

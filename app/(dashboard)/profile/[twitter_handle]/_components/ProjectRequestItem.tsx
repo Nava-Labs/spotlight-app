@@ -1,4 +1,4 @@
-import React, { useTransition } from 'react';
+import React, { useTransition } from "react";
 import { ThreadRequest } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,7 @@ import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 
 interface ProjectRequestItemProps {
   request: ThreadRequest;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }
 
@@ -91,11 +92,7 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
           </DialogContent>
         </Dialog>
         {request.status === "requested" && (
-          <Button
-            disabled
-            variant={"outline"}
-            className="rounded-full"
-          >
+          <Button disabled variant={"outline"} className="rounded-full">
             Waiting for approval..
           </Button>
         )}
@@ -110,29 +107,21 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
               </DialogTrigger>
               <DialogContent className="rounded-xl">
                 <DialogHeader>
-                  <DialogTitle>
-                    Approve this creator&apos;s work?
-                  </DialogTitle>
+                  <DialogTitle>Approve this creator&apos;s work?</DialogTitle>
                 </DialogHeader>
                 <div className="text-muted-foreground">
-                  By Approving this thread. You will transfer your
-                  funds to @{request.influencer?.twitter_handle}{" "}
-                  wallet. Make sure the fulfilled request is
-                  acceptable to avoid unwanted outcome.
+                  By Approving this thread. You will transfer your funds to @
+                  {request.influencer?.twitter_handle} wallet. Make sure the
+                  fulfilled request is acceptable to avoid unwanted outcome.
                 </div>
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button
-                      variant={"outline"}
-                      className="rounded-full"
-                    >
+                    <Button variant={"outline"} className="rounded-full">
                       Cancel
                     </Button>
                   </DialogClose>
                   <Button
-                    onClick={async () =>
-                      await handleApprove(request.id)
-                    }
+                    onClick={async () => await handleApprove(request.id)}
                     loading={isApproving}
                     className="rounded-full"
                   >
@@ -144,10 +133,7 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
           </div>
         )}
         {request.status === "approved" && (
-          <Button
-            disabled
-            className="rounded-full bg-green-600"
-          >
+          <Button disabled className="rounded-full bg-green-600">
             <p>Approved</p>
             <CheckIcon className="w-4 h-4 ml-2" />{" "}
           </Button>
@@ -166,9 +152,7 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
             className="rounded-full"
             disabled={!!request.tx_receipt}
           >
-            <p>
-              {!request.tx_receipt ? "Claim Refund" : "Refunded"}{" "}
-            </p>
+            <p>{!request.tx_receipt ? "Claim Refund" : "Refunded"} </p>
             <CheckIcon className="w-4 h-4 ml-2" />{" "}
           </Button>
         )}
@@ -178,3 +162,4 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
 };
 
 export default ProjectRequestItem;
+

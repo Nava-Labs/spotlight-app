@@ -1,4 +1,4 @@
-import React, { useCallback, useTransition } from 'react';
+import React, { useCallback, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { useSpotlightClaim } from "@/app/claim";
 interface RequestListItemProps {
   request: ThreadRequest;
   status: RequestStatus;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
   influencerTwitterHandle?: string;
 }
@@ -31,55 +32,64 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
     statusOnSuccess: "approved",
   });
 
-  const onDecline = useCallback(async (id: number) => {
-    startDecline(async () => {
-      const { error } = await client
-        .from("requests")
-        .update({ status: "declined" })
-        .eq("id", id);
+  const onDecline = useCallback(
+    async (id: number) => {
+      startDecline(async () => {
+        const { error } = await client
+          .from("requests")
+          .update({ status: "declined" })
+          .eq("id", id);
 
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  }, [client, refetchRequests]);
-
-  const onAccept = useCallback(async (id: number, text: string) => {
-    if (!influencerTwitterHandle) return;
-    startAccept(async () => {
-      const postTweet = await fetch(`/api/twitter/post`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({
-          creator: influencerTwitterHandle,
-          text: text,
-        }),
+        if (error) {
+          console.error("Error updating requests:", error);
+        } else {
+          refetchRequests();
+        }
       });
+    },
+    [client, refetchRequests],
+  );
 
-      if (!postTweet.ok) return;
-      const res = await postTweet.json();
-      console.log(res);
+  const onAccept = useCallback(
+    async (id: number, text: string) => {
+      if (!influencerTwitterHandle) return;
+      startAccept(async () => {
+        const postTweet = await fetch(`/api/twitter/post`, {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({
+            creator: influencerTwitterHandle,
+            text: text,
+          }),
+        });
 
-      const { error } = await client
-        .from("requests")
-        .update({ status: "pending" })
-        .eq("id", id);
+        if (!postTweet.ok) return;
+        const res = await postTweet.json();
+        console.log(res);
 
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  }, [client, influencerTwitterHandle, refetchRequests]);
+        const { error } = await client
+          .from("requests")
+          .update({ status: "pending" })
+          .eq("id", id);
 
-  const onClaim = useCallback(async (amount: number, id: number) => {
-    await handleClaim(amount, id, refetchRequests);
-  }, [handleClaim, refetchRequests]);
+        if (error) {
+          console.error("Error updating requests:", error);
+        } else {
+          refetchRequests();
+        }
+      });
+    },
+    [client, influencerTwitterHandle, refetchRequests],
+  );
+
+  const onClaim = useCallback(
+    async (amount: number, id: number) => {
+      await handleClaim(amount, id, refetchRequests);
+    },
+    [handleClaim, refetchRequests],
+  );
 
   return (
     <li className="p-6">
@@ -148,9 +158,7 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
         )}
         {status === "approved" && (
           <Button
-            onClick={async () =>
-              await onClaim(0.01, request.id)
-            }
+            onClick={async () => await onClaim(0.01, request.id)}
             loading={isClaiming}
             disabled={!!request.tx_receipt}
             className="rounded-full bg-green-600"
@@ -165,3 +173,4 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
 };
 
 export default RequestListItem;
+

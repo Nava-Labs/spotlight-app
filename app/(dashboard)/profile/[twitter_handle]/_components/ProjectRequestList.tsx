@@ -1,13 +1,14 @@
-import React from 'react';
+import React from "react";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThreadRequest, Influencers } from "@/types";
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
-import ProjectRequestItem from './ProjectRequestItem';
+import ProjectRequestItem from "./ProjectRequestItem";
 
 interface ProjectRequestListProps {
   requests: ThreadRequest[];
   influencerData: Influencers;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }
 
@@ -42,3 +43,4 @@ const ProjectRequestList: React.FC<ProjectRequestListProps> = ({
 };
 
 export default ProjectRequestList;
+
