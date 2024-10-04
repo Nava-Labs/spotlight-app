@@ -10,5 +10,7 @@ export type User = {
 };
 
 export type ThreadRequest = Requests & {
-  influencer: Pick<Influencers, "twitter_handle"> | null;
+  influencer: Pick<Influencers, "twitter_handle" | "price"> | null;
 };
+
+export type RequestStatus = "requested" | "pending" | "approved" | "declined";

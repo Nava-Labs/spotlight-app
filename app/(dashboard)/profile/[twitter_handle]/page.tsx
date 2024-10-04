@@ -22,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSpotlightRequest } from "../../../request";
-import { Influencers, ThreadRequest } from "@/types";
+import { Influencers, RequestStatus, ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useParams } from "next/navigation";
@@ -58,7 +58,7 @@ export default function Dashboard() {
   const getRequestsQuery = useCallback(() => {
     const base = client
       .from("requests")
-      .select("*, influencer:influencers(twitter_handle)")
+      .select("*, influencer:influencers(twitter_handle,price)")
       .eq("influencer_id", influencerData?.id ?? "");
     if (isInfluencer) return base;
 
@@ -194,6 +194,10 @@ const ProjectView = ({
   const client = useSupabaseBrowser();
   const [isApproving, startApprove] = useTransition();
 
+  const { claim: handleDecline, isLoading: isDeclining } = useSpotlightClaim({
+    statusOnSuccess: "declined",
+  });
+
   const handleApprove = async (id: number) => {
     startApprove(async () => {
       const { error } = await client
@@ -322,6 +326,28 @@ const ProjectView = ({
                       <CheckIcon className="w-4 h-4 ml-2" />{" "}
                     </Button>
                   )}
+                  {request.status === "declined" && (
+                    <Button
+                      loading={isDeclining}
+                      onClick={async () =>
+                        await handleDecline(
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          (request.influencer?.price as any).post,
+                          request.id,
+                          refetchRequests,
+                        )
+                      }
+                      className="rounded-full"
+                      disabled={!!request.tx_receipt}
+                    >
+                      <p>
+                        {!request.tx_receipt
+                          ? "Claim Payment"
+                          : "Declined Work"}{" "}
+                      </p>
+                      <CheckIcon className="w-4 h-4 ml-2" />{" "}
+                    </Button>
+                  )}
                 </div>
               </li>
             ))}
@@ -350,7 +376,9 @@ const InfluencerView = ({
   const [amount, setAmount] = useState("");
 
   const { request, isLoading } = useSpotlightRequest();
-  const { claim: handleClaim, isLoading: isClaiming } = useSpotlightClaim();
+  const { claim: handleClaim, isLoading: isClaiming } = useSpotlightClaim({
+    statusOnSuccess: "approved",
+  });
 
   const handleDecline = async (id: number) => {
     startDecline(async () => {
@@ -401,7 +429,7 @@ const InfluencerView = ({
     [influencerData],
   );
 
-  const renderRequestList = (status: "requested" | "pending" | "approved") => (
+  const renderRequestList = (status: RequestStatus) => (
     <ScrollArea className="h-[600px] pr-4">
       <ul className="space-y-4">
         {!requests.filter((req) => req.status === status).length && (

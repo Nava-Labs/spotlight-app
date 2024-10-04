@@ -10,9 +10,14 @@ import { useCallback, useTransition } from "react";
 import invariant from "tiny-invariant";
 import bs58 from "bs58";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
+import { RequestStatus } from "@/types";
 
 // FIX: This need to be done in the server. Not client!
-export function useSpotlightClaim() {
+export function useSpotlightClaim({
+  statusOnSuccess,
+}: {
+  statusOnSuccess: RequestStatus;
+}) {
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const client = useSupabaseBrowser();
@@ -26,7 +31,7 @@ export function useSpotlightClaim() {
   const keypairSignerAuthority = Keypair.fromSecretKey(signerAuthority);
 
   const claim = useCallback(
-    async (amount: number, id: number, refetchRequests: () => void) => {
+    async (amount: number, requestId: number, refetchRequests: () => void) => {
       startClaim(async () => {
         if (!publicKey) return;
         try {
@@ -49,13 +54,16 @@ export function useSpotlightClaim() {
           tx.partialSign(keypairSignerAuthority);
 
           const signature = await sendTransaction(tx, connection);
-          console.log(`Claim transaction signature for ${id}:`, signature);
+          console.log(
+            `Claim transaction signature for ${requestId}:`,
+            signature,
+          );
 
           if (signature) {
             const { error } = await client
               .from("requests")
-              .update({ status: "approved", tx_receipt: signature })
-              .eq("id", id);
+              .update({ status: statusOnSuccess, tx_receipt: signature })
+              .eq("id", requestId);
 
             if (error) {
               console.error("Error updating request:", error);
