@@ -17,13 +17,22 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const fontData = await fetch(
+    new URL("/app/fonts/Manrope-Bold.ttf", import.meta.url),
+  ).then((res) => res.arrayBuffer());
   const spotlightImage = await fetch(
-    new URL("/public/Spotlight.jpg", import.meta.url),
+    new URL("/public/Spotlight.png", import.meta.url),
   ).then(async (res) => {
     const arrayBuffer = await res.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString("base64");
-    return `data:image/jpeg;base64,${base64}`;
+    return `data:image/png;base64,${base64}`;
   });
+
+  const getRandomScore = () => {
+    return Math.floor(Math.random() * (100 - 80 + 1)) + 80;
+  };
+
+  const randomScore = getRandomScore();
 
   return new ImageResponse(
     (
@@ -50,22 +59,58 @@ export async function GET(request: NextRequest) {
             objectFit: "cover",
           }}
         />
-        <div tw="flex flex-col justify-center items-center mx-80">
+        <div tw="flex flex-col justify-center items-center mx-auto">
+          <p
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgb(121, 40, 202), rgb(255, 0, 128))",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              color: "transparent",
+              fontSize: "450px",
+              fontFamily: "Manrope-SemiBold",
+              justifyContent: "center",
+              alignSelf: "center",
+            }}
+          >
+            {randomScore}
+          </p>
+          <div
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, rgb(121, 40, 202), rgb(255, 0, 128))",
+              backgroundClip: "text",
+              WebkitBackgroundClip: "text",
+              color: "transparent",
+              fontSize: "200px",
+              fontFamily: "Manrope-SemiBold",
+              justifyContent: "center",
+              alignSelf: "center",
+            }}
+          >
+            Social Score
+          </div>
+
           <img
             width="800"
             height="800"
             src={`https://pbs.twimg.com/profile_images/1837747151927185408/2C6--z0u_400x400.jpg`}
-            style={{
-              borderRadius: 500,
-            }}
+            tw="mt-60"
           />
-          <p tw="text-9xl text-white mt-20">x.com/{twitterHandle}</p>
+          <p tw="text-9xl text-white mt-20 ">@{twitterHandle}</p>
         </div>
       </div>
     ),
     {
       width: 4500,
       height: 4500,
+      fonts: [
+        {
+          name: "Manrope",
+          data: fontData,
+          style: "normal",
+        },
+      ],
     },
   );
 }
