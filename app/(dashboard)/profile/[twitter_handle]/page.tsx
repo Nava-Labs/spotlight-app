@@ -74,7 +74,7 @@ export default function Dashboard() {
     if (wallet.publicKey) {
       wallet.connect();
     }
-  }, [wallet.publicKey]);
+  }, [wallet]);
 
   if (!influencerData || !wallet.publicKey || !requestsData) {
     return (
@@ -94,7 +94,7 @@ export default function Dashboard() {
               <p className="text-5xl font-bold">78</p>
             </div>
           </div>
-          <Card className="relative mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md bg-transparent py-6 overflow-hidden">
+          <Card className="relative mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md bg-transparent overflow-hidden">
             <div className="flex h-full w-fit items-center justify-center">
               <ApprovedEmptyState />
             </div>
@@ -127,14 +127,14 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background py-4 px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex space-x-8">
+          <div className="w-full flex justify-between">
             <div>
               <p className="text-xl font-semibold">@{twitterHandle}</p>
               <p className="text-base text-muted-foreground">
                 {influencerData.blinks_description}
               </p>
             </div>
-            <div className="flex flex-col min-w-max items-center">
+            <div className="flex flex-col min-w-max items-center ml-8">
               <p className="text-xs uppercase text-muted-foreground">
                 social score
               </p>
@@ -154,14 +154,14 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background py-4 px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex space-x-8">
+        <div className="w-full flex justify-between">
           <div>
             <p className="text-xl font-semibold">@{twitterHandle}</p>
             <p className="text-base text-muted-foreground">
               {influencerData?.blinks_description}
             </p>
           </div>
-          <div className="flex flex-col min-w-max items-center">
+          <div className="flex flex-col min-w-max items-center ml-8">
             <p className="text-xs uppercase text-muted-foreground">
               social score
             </p>
@@ -232,19 +232,21 @@ const ProjectView = ({
               <li key={request.id} className="p-6">
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <h3 className="text-lg font-semibold">{request.title}</h3>
+                    <div className="flex space-x-2 items-center">
+                      <h3 className="text-lg font-semibold">{request.title}</h3>
+                      {request.status === "declined" && (
+                        <Badge
+                          variant={"outline"}
+                          className="bg-red-100 text-red-500 h-5 border-0"
+                        >
+                          Declined
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       Requested to @{request.influencer?.twitter_handle}
                     </p>
                   </div>
-                  {request.status === "declined" && (
-                    <Badge
-                      variant={"outline"}
-                      className="bg-red-100 text-red-500 border-0 mb-1 px-3 py-1 uppercase"
-                    >
-                      Declined
-                    </Badge>
-                  )}
                 </div>
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                   {request.details}
@@ -284,7 +286,7 @@ const ProjectView = ({
                     <div className="flex space-x-2">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button className="rounded-full">
+                          <Button className="rounded-full bg-green-600 hover:bg-green-500">
                             <p>Approve work</p>
                             <CheckIcon className="w-4 h-4 ml-2" />{" "}
                           </Button>
@@ -433,12 +435,12 @@ const InfluencerView = ({
         }
       });
     },
-    [influencerData],
+    [client, influencerData, refetchRequests],
   );
 
   const renderRequestList = (status: RequestStatus) => (
-    <ScrollArea className="h-[600px] pr-4">
-      <ul className="space-y-4">
+    <ScrollArea className="min-h-fit max-h-[600px]">
+      <ul className="divide-y">
         {!requests.filter((req) => req.status === status).length && (
           <Card className="mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md border-none bg-transparent py-6 shadow-none">
             <div className="flex h-full w-fit items-center justify-center">
@@ -454,7 +456,7 @@ const InfluencerView = ({
         {requests
           .filter((req) => req.status === status)
           .map((request) => (
-            <li key={request.id} className="bg-card rounded-xl p-4 shadow-sm">
+            <li key={request.id} className="p-6">
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <h3 className="text-lg font-semibold">{request.title}</h3>
@@ -568,14 +570,20 @@ const InfluencerView = ({
           </TabsTrigger>
         </TabsList>
         <Card className="mt-2">
-          <TabsContent value="requested">
-            <CardContent>{renderRequestList("requested")}</CardContent>
+          <TabsContent value="requested" className="mt-0">
+            <CardContent className="p-0">
+              {renderRequestList("requested")}
+            </CardContent>
           </TabsContent>
-          <TabsContent value="pending">
-            <CardContent>{renderRequestList("pending")}</CardContent>
+          <TabsContent value="pending" className="mt-0">
+            <CardContent className="p-0">
+              {renderRequestList("pending")}
+            </CardContent>
           </TabsContent>
-          <TabsContent value="approved">
-            <CardContent>{renderRequestList("approved")}</CardContent>
+          <TabsContent value="approved" className="mt-0">
+            <CardContent className="p-0">
+              {renderRequestList("approved")}
+            </CardContent>
           </TabsContent>
         </Card>
       </Tabs>
