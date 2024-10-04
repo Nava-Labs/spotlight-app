@@ -492,7 +492,7 @@ const InfluencerView = ({
                     disabled={!!request.tx_receipt}
                     className="rounded-full bg-green-600"
                   >
-                    <p>Claim Payment</p>
+                    <p>{!!request.tx_receipt ? "Claim Payment" : "Claimed"} </p>
                     <CheckIcon className="w-4 h-4 ml-2" />{" "}
                   </Button>
                 )}
