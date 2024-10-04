@@ -22,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSpotlightRequest } from "../../../request";
-import { Influencers, RequestStatus, ThreadRequest } from "@/types";
+import { Influencers, ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useParams } from "next/navigation";
@@ -34,6 +34,8 @@ import { CheckIcon, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import WalletConnect from "@/app/_components/ConnectWallet";
 import { useSpotlightClaim } from "@/app/claim";
+import RequestList from './RequestList';
+import ProjectRequestList from './ProjectRequestList';
 
 export default function Dashboard() {
   const wallet = useWallet();
@@ -180,7 +182,6 @@ export default function Dashboard() {
     </div>
   );
 }
-
 const ProjectView = ({
   requests,
   influencerData,
@@ -188,180 +189,16 @@ const ProjectView = ({
 }: {
   requests: ThreadRequest[];
   influencerData: Influencers;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
-  const client = useSupabaseBrowser();
-  const [isApproving, startApprove] = useTransition();
-
-  const { claim: handleDecline, isLoading: isDeclining } = useSpotlightClaim({
-    statusOnSuccess: "declined",
-  });
-
-  const handleApprove = async (id: number) => {
-    startApprove(async () => {
-      const { error } = await client
-        .from("requests")
-        .update({ status: "approved" })
-        .eq("id", id);
-
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  };
-
   return (
     <Card className="mt-6">
       <CardContent className="p-0">
-        <ScrollArea className="min-h-fit max-h-[600px]">
-          <ul className="divide-y">
-            {!requests.length && (
-              <Card className="mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md border-none bg-transparent py-6 shadow-none">
-                <div className="flex h-full w-fit items-center justify-center">
-                  <ApprovedEmptyState />
-                </div>
-                <p className="text-center text-muted-foreground/50">
-                  You have no tweet request for @{influencerData.twitter_handle}
-                </p>
-              </Card>
-            )}
-            {requests.map((request) => (
-              <li key={request.id} className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="flex space-x-2 items-center">
-                      <h3 className="text-lg font-semibold">{request.title}</h3>
-                      {request.status === "declined" && (
-                        <Badge
-                          variant={"outline"}
-                          className="bg-red-100 text-red-500 h-5 border-0"
-                        >
-                          Declined
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      Requested to @{request.influencer?.twitter_handle}
-                    </p>
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                  {request.details}
-                </p>
-                <div className="flex justify-between items-center">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" className="rounded-full">
-                        View Details
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="rounded-xl">
-                      <div className="mt-4">
-                        <p className="text-sm text-muted-foreground mb-4">
-                          {request.details}
-                        </p>
-                        <div className="flex justify-end space-x-2">
-                          <DialogClose asChild>
-                            <Button variant="outline" className="rounded-full">
-                              Close
-                            </Button>
-                          </DialogClose>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  {request.status === "requested" && (
-                    <Button
-                      disabled
-                      variant={"outline"}
-                      className="rounded-full"
-                    >
-                      Waiting for approval..
-                    </Button>
-                  )}
-                  {request.status === "pending" && (
-                    <div className="flex space-x-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button className="rounded-full bg-green-600 hover:bg-green-500">
-                            <p>Approve work</p>
-                            <CheckIcon className="w-4 h-4 ml-2" />{" "}
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="rounded-xl">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Approve this creator&apos;s work?
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="text-muted-foreground">
-                            By Approving this thread. You will transfer your
-                            funds to @{request.influencer?.twitter_handle}{" "}
-                            wallet. Make sure the fulfilled request is
-                            acceptable to avoid unwanted outcome.
-                          </div>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button
-                                variant={"outline"}
-                                className="rounded-full"
-                              >
-                                Cancel
-                              </Button>
-                            </DialogClose>
-                            <Button
-                              onClick={async () =>
-                                await handleApprove(request.id)
-                              }
-                              loading={isApproving}
-                              className="rounded-full"
-                            >
-                              Proceed transfer
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  )}
-                  {request.status === "approved" && (
-                    <Button
-                      disabled
-                      loading={isApproving}
-                      className="rounded-full bg-green-600"
-                    >
-                      <p>Approved</p>
-                      <CheckIcon className="w-4 h-4 ml-2" />{" "}
-                    </Button>
-                  )}
-
-                  {request.status === "declined" && (
-                    <Button
-                      loading={isDeclining}
-                      onClick={async () =>
-                        await handleDecline(
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          (request.influencer?.price as any).post,
-                          request.id,
-                          refetchRequests,
-                        )
-                      }
-                      className="rounded-full"
-                      disabled={!!request.tx_receipt}
-                    >
-                      <p>
-                        {!request.tx_receipt ? "Claim Refund" : "Refunded"}{" "}
-                      </p>
-                      <CheckIcon className="w-4 h-4 ml-2" />{" "}
-                    </Button>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </ScrollArea>
+        <ProjectRequestList
+          requests={requests}
+          influencerData={influencerData}
+          refetchRequests={refetchRequests}
+        />
       </CardContent>
     </Card>
   );
@@ -374,171 +211,11 @@ const InfluencerView = ({
 }: {
   requests: ThreadRequest[];
   influencerData: Influencers;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
   const wallet = useWallet();
-  const client = useSupabaseBrowser();
-
-  const [isDeclining, startDecline] = useTransition();
-  const [isAccepting, startAccept] = useTransition();
   const [amount, setAmount] = useState("");
-
   const { request, isLoading } = useSpotlightRequest();
-  const { claim: handleClaim, isLoading: isClaiming } = useSpotlightClaim({
-    statusOnSuccess: "approved",
-  });
-
-  const handleDecline = async (id: number) => {
-    startDecline(async () => {
-      const { error } = await client
-        .from("requests")
-        .update({ status: "declined" })
-        .eq("id", id);
-
-      if (error) {
-        console.error("Error updating requests:", error);
-      } else {
-        refetchRequests();
-      }
-    });
-  };
-
-  const handleAccept = useCallback(
-    async (id: number, text: string) => {
-      if (!influencerData) return;
-      startAccept(async () => {
-        const postTweet = await fetch(`/api/twitter/post`, {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({
-            creator: influencerData.twitter_handle,
-            text: text,
-          }),
-        });
-
-        if (!postTweet.ok) return;
-        const res = await postTweet.json();
-        console.log(res);
-
-        const { error } = await client
-          .from("requests")
-          .update({ status: "pending" })
-          .eq("id", id);
-
-        if (error) {
-          console.error("Error updating requests:", error);
-        } else {
-          refetchRequests();
-        }
-      });
-    },
-    [client, influencerData, refetchRequests],
-  );
-
-  const renderRequestList = (status: RequestStatus) => (
-    <ScrollArea className="min-h-fit max-h-[600px]">
-      <ul className="divide-y">
-        {!requests.filter((req) => req.status === status).length && (
-          <Card className="mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md border-none bg-transparent py-6 shadow-none">
-            <div className="flex h-full w-fit items-center justify-center">
-              {status === "requested" && <RequestedEmptyState />}
-              {status === "pending" && <PendingEmptyState />}
-              {status === "approved" && <ApprovedEmptyState />}
-            </div>
-            <p className="text-center text-muted-foreground/50">
-              No {status} post found.
-            </p>
-          </Card>
-        )}
-        {requests
-          .filter((req) => req.status === status)
-          .map((request) => (
-            <li key={request.id} className="p-6">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="text-lg font-semibold">{request.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    By {request.requested_by}
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                {request.details}
-              </p>
-              <div className="flex justify-between items-center">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="rounded-full">
-                      View Details
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="rounded-xl">
-                    <div className="mt-4">
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {request.details}
-                      </p>
-                      <div className="flex justify-end space-x-2">
-                        <DialogClose asChild>
-                          <Button variant="outline" className="rounded-full">
-                            Close
-                          </Button>
-                        </DialogClose>
-                        {status === "requested" && (
-                          <Button className="rounded-full">Approve</Button>
-                        )}
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-                {status === "requested" && (
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={() => handleDecline(request.id)}
-                      loading={isDeclining}
-                      className="rounded-full"
-                      variant={"destructive"}
-                    >
-                      <p>Decline</p>
-                      <Trash2Icon className="w-4 h-4 ml-2" />{" "}
-                    </Button>
-                    <Button
-                      onClick={() => handleAccept(request.id, request.details!)}
-                      loading={isAccepting}
-                      className="rounded-full"
-                    >
-                      <p>Accept Tweet</p>
-                      <CheckIcon className="w-4 h-4 ml-2" />{" "}
-                    </Button>
-                  </div>
-                )}
-                {status === "pending" && (
-                  <Button disabled className="rounded-full">
-                    <p>Pending approval</p>
-                    <CheckIcon className="w-4 h-4 ml-2" />{" "}
-                  </Button>
-                )}
-                {status === "approved" && (
-                  <Button
-                    onClick={async () =>
-                      await handleClaim(0.01, request.id, refetchRequests)
-                    }
-                    loading={isClaiming}
-                    disabled={!!request.tx_receipt}
-                    className="rounded-full bg-green-600"
-                  >
-                    <p>{!request.tx_receipt ? "Claim Payment" : "Claimed"} </p>
-                    <CheckIcon className="w-4 h-4 ml-2" />{" "}
-                  </Button>
-                )}
-              </div>
-            </li>
-          ))}
-      </ul>
-    </ScrollArea>
-  );
 
   return (
     <>
@@ -572,17 +249,32 @@ const InfluencerView = ({
         <Card className="mt-2">
           <TabsContent value="requested" className="mt-0">
             <CardContent className="p-0">
-              {renderRequestList("requested")}
+              <RequestList
+                requests={requests}
+                status="requested"
+                refetchRequests={refetchRequests}
+                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+              />
             </CardContent>
           </TabsContent>
           <TabsContent value="pending" className="mt-0">
             <CardContent className="p-0">
-              {renderRequestList("pending")}
+              <RequestList
+                requests={requests}
+                status="pending"
+                refetchRequests={refetchRequests}
+                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+              />
             </CardContent>
           </TabsContent>
           <TabsContent value="approved" className="mt-0">
             <CardContent className="p-0">
-              {renderRequestList("approved")}
+              <RequestList
+                requests={requests}
+                status="approved"
+                refetchRequests={refetchRequests}
+                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+              />
             </CardContent>
           </TabsContent>
         </Card>
