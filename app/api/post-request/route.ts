@@ -45,7 +45,10 @@ export const GET = async (req: Request) => {
   }
 
   const payload: ActionGetResponse = {
-    icon: new URL("/Spotlight.jpg", new URL(req.url).origin).toString(),
+    icon: new URL(
+      `/api/og/?twitter_handle=${influencer.twitter_handle}`,
+      new URL(req.url).origin,
+    ).toString(),
     label: "Request & Pay", // this value will be ignored since `links.actions` exists
     title: influencer.blinks_title,
     description: influencer.blinks_description,
