@@ -215,9 +215,9 @@ const ProjectView = ({
 
   return (
     <Card className="mt-6">
-      <CardContent className="py-4">
-        <ScrollArea className="h-[600px] pr-4">
-          <ul className="space-y-4">
+      <CardContent className="p-0">
+        <ScrollArea className="min-h-fit max-h-[600px]">
+          <ul className="divide-y">
             {!requests.length && (
               <Card className="mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md border-none bg-transparent py-6 shadow-none">
                 <div className="flex h-full w-fit items-center justify-center">
@@ -229,7 +229,7 @@ const ProjectView = ({
               </Card>
             )}
             {requests.map((request) => (
-              <li key={request.id} className="bg-card rounded-xl p-4 shadow-sm">
+              <li key={request.id} className="p-6">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="text-lg font-semibold">{request.title}</h3>
@@ -237,6 +237,14 @@ const ProjectView = ({
                       Requested to @{request.influencer?.twitter_handle}
                     </p>
                   </div>
+                  {request.status === "declined" && (
+                    <Badge
+                      variant={"outline"}
+                      className="bg-red-100 text-red-500 border-0 mb-1 px-3 py-1 uppercase"
+                    >
+                      Declined
+                    </Badge>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                   {request.details}
@@ -326,6 +334,7 @@ const ProjectView = ({
                       <CheckIcon className="w-4 h-4 ml-2" />{" "}
                     </Button>
                   )}
+
                   {request.status === "declined" && (
                     <Button
                       loading={isDeclining}
@@ -341,9 +350,7 @@ const ProjectView = ({
                       disabled={!!request.tx_receipt}
                     >
                       <p>
-                        {!request.tx_receipt
-                          ? "Claim Payment"
-                          : "Declined Work"}{" "}
+                        {!request.tx_receipt ? "Claim Refund" : "Refunded"}{" "}
                       </p>
                       <CheckIcon className="w-4 h-4 ml-2" />{" "}
                     </Button>
