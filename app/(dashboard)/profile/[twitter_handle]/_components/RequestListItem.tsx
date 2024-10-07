@@ -6,10 +6,16 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { CheckIcon, Trash2Icon } from "lucide-react";
+import { CheckIcon, Lightbulb, Trash2Icon } from "lucide-react";
 import { ThreadRequest, RequestStatus } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useSpotlightClaim } from "@/app/claim";
+import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface RequestListItemProps {
   request: ThreadRequest;
@@ -100,77 +106,75 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
             By {request.requested_by}
           </p>
         </div>
+        <AnimatedCircularProgressBar
+          max={100}
+          min={0}
+          value={89}
+          gaugePrimaryColor="#34d399"
+          gaugeSecondaryColor="rgba(0, 0, 0, 0.1)"
+          className="size-10 text-lg font-bold"
+        />
       </div>
       <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
         {request.details}
       </p>
-      <div className="flex justify-between items-center">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="rounded-full">
-              View Details
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="rounded-xl">
-            <div className="mt-4">
-              <p className="text-sm text-muted-foreground mb-4">
-                {request.details}
-              </p>
-              <div className="flex justify-end space-x-2">
-                <DialogClose asChild>
-                  <Button variant="outline" className="rounded-full">
-                    Close
-                  </Button>
-                </DialogClose>
-                {status === "requested" && (
-                  <Button className="rounded-full">Approve</Button>
-                )}
+      <div>
+        <Collapsible>
+          <div className="flex justify-between items-center">
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="rounded-full">
+                <p>Read AI Analysis</p>
+                <Lightbulb className="size-4 ml-2" />
+              </Button>
+            </CollapsibleTrigger>
+            {status === "requested" && (
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => onDecline(request.id)}
+                  loading={isDeclining}
+                  className="rounded-full"
+                  variant={"destructive"}
+                >
+                  <p>Decline</p>
+                  <Trash2Icon className="w-4 h-4 ml-2" />{" "}
+                </Button>
+                <Button
+                  onClick={() => onAccept(request.id, request.details!)}
+                  loading={isAccepting}
+                  className="rounded-full"
+                >
+                  <p>Accept Tweet</p>
+                  <CheckIcon className="w-4 h-4 ml-2" />{" "}
+                </Button>
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-        {status === "requested" && (
-          <div className="flex space-x-2">
-            <Button
-              onClick={() => onDecline(request.id)}
-              loading={isDeclining}
-              className="rounded-full"
-              variant={"destructive"}
-            >
-              <p>Decline</p>
-              <Trash2Icon className="w-4 h-4 ml-2" />{" "}
-            </Button>
-            <Button
-              onClick={() => onAccept(request.id, request.details!)}
-              loading={isAccepting}
-              className="rounded-full"
-            >
-              <p>Accept Tweet</p>
-              <CheckIcon className="w-4 h-4 ml-2" />{" "}
-            </Button>
+            )}
+            {status === "pending" && (
+              <Button disabled className="rounded-full">
+                <p>Pending approval</p>
+                <CheckIcon className="w-4 h-4 ml-2" />{" "}
+              </Button>
+            )}
+            {status === "approved" && (
+              <Button
+                onClick={async () => await onClaim(0.01, request.id)}
+                loading={isClaiming}
+                disabled={!!request.tx_receipt}
+                className="rounded-full bg-green-600"
+              >
+                <p>{!request.tx_receipt ? "Claim Payment" : "Claimed"} </p>
+                <CheckIcon className="w-4 h-4 ml-2" />{" "}
+              </Button>
+            )}
           </div>
-        )}
-        {status === "pending" && (
-          <Button disabled className="rounded-full">
-            <p>Pending approval</p>
-            <CheckIcon className="w-4 h-4 ml-2" />{" "}
-          </Button>
-        )}
-        {status === "approved" && (
-          <Button
-            onClick={async () => await onClaim(0.01, request.id)}
-            loading={isClaiming}
-            disabled={!!request.tx_receipt}
-            className="rounded-full bg-green-600"
-          >
-            <p>{!request.tx_receipt ? "Claim Payment" : "Claimed"} </p>
-            <CheckIcon className="w-4 h-4 ml-2" />{" "}
-          </Button>
-        )}
+          <CollapsibleContent className="ml-1 border-l-4 border-blue-500 bg-blue-50 mt-2 pl-4 pr-2 py-3">
+            <p className="text-sm text-muted-foreground mb-4 font-mono">
+              {">"} {request.details}
+            </p>
+          </CollapsibleContent>
+        </Collapsible>
       </div>
     </li>
   );
 };
 
 export default RequestListItem;
-

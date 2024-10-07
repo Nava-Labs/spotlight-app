@@ -200,83 +200,65 @@ const InfluencerView = ({
   const { request, isLoading } = useSpotlightRequest();
 
   return (
-    <>
-      <Tabs defaultValue="requested" className="w-full mt-6">
-        <TabsList className="grid w-full grid-cols-3 rounded-full h-10 p-1">
-          <TabsTrigger value="requested" className="rounded-full space-x-2">
-            <p>Requested</p>
-            {!!requests.filter((req) => req.status === "requested").length && (
-              <Badge className="px-1 py-0 bg-zinc-500">
-                {requests.filter((req) => req.status === "requested").length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="pending" className="rounded-full space-x-2">
-            <p>Pending</p>
-            {!!requests.filter((req) => req.status === "pending").length && (
-              <Badge className="px-1 py-0 bg-zinc-500">
-                {requests.filter((req) => req.status === "pending").length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="approved" className="rounded-full space-x-2">
-            <p>Approved</p>
-            {!!requests.filter((req) => req.status === "approved").length && (
-              <Badge className="px-1 py-0 bg-zinc-500">
-                {requests.filter((req) => req.status === "approved").length}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
-        <Card className="mt-2">
-          <TabsContent value="requested" className="mt-0">
-            <CardContent className="p-0">
-              <RequestList
-                requests={requests}
-                status="requested"
-                refetchRequests={refetchRequests}
-                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
-              />
-            </CardContent>
-          </TabsContent>
-          <TabsContent value="pending" className="mt-0">
-            <CardContent className="p-0">
-              <RequestList
-                requests={requests}
-                status="pending"
-                refetchRequests={refetchRequests}
-                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
-              />
-            </CardContent>
-          </TabsContent>
-          <TabsContent value="approved" className="mt-0">
-            <CardContent className="p-0">
-              <RequestList
-                requests={requests}
-                status="approved"
-                refetchRequests={refetchRequests}
-                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
-              />
-            </CardContent>
-          </TabsContent>
-        </Card>
-      </Tabs>
-      <input
-        type="number"
-        placeholder="Amount in SOL"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        className="w-full mt-8"
-      />
-
-      <Button
-        onClick={async () => await request(1)}
-        className="w-full"
-        loading={isLoading}
-        disabled={!wallet.publicKey}
-      >
-        Request SOL
-      </Button>
-    </>
+    <Tabs defaultValue="requested" className="w-full mt-6">
+      <TabsList className="grid w-full grid-cols-3 rounded-full h-10 p-1">
+        <TabsTrigger value="requested" className="rounded-full space-x-2">
+          <p>Requested</p>
+          {!!requests.filter((req) => req.status === "requested").length && (
+            <Badge className="px-1 py-0 bg-zinc-500">
+              {requests.filter((req) => req.status === "requested").length}
+            </Badge>
+          )}
+        </TabsTrigger>
+        <TabsTrigger value="pending" className="rounded-full space-x-2">
+          <p>Pending</p>
+          {!!requests.filter((req) => req.status === "pending").length && (
+            <Badge className="px-1 py-0 bg-zinc-500">
+              {requests.filter((req) => req.status === "pending").length}
+            </Badge>
+          )}
+        </TabsTrigger>
+        <TabsTrigger value="approved" className="rounded-full space-x-2">
+          <p>Approved</p>
+          {!!requests.filter((req) => req.status === "approved").length && (
+            <Badge className="px-1 py-0 bg-zinc-500">
+              {requests.filter((req) => req.status === "approved").length}
+            </Badge>
+          )}
+        </TabsTrigger>
+      </TabsList>
+      <Card className="mt-2">
+        <TabsContent value="requested" className="mt-0">
+          <CardContent className="p-0">
+            <RequestList
+              requests={requests}
+              status="requested"
+              refetchRequests={refetchRequests}
+              influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+            />
+          </CardContent>
+        </TabsContent>
+        <TabsContent value="pending" className="mt-0">
+          <CardContent className="p-0">
+            <RequestList
+              requests={requests}
+              status="pending"
+              refetchRequests={refetchRequests}
+              influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+            />
+          </CardContent>
+        </TabsContent>
+        <TabsContent value="approved" className="mt-0">
+          <CardContent className="p-0">
+            <RequestList
+              requests={requests}
+              status="approved"
+              refetchRequests={refetchRequests}
+              influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+            />
+          </CardContent>
+        </TabsContent>
+      </Card>
+    </Tabs>
   );
 };

@@ -10,10 +10,19 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, Flag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSpotlightClaim } from "@/app/claim";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
+import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { PopoverArrow } from "@radix-ui/react-popover";
+import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface ProjectRequestItemProps {
   request: ThreadRequest;
@@ -49,21 +58,30 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
   return (
     <li className="p-6">
       <div className="flex justify-between items-start mb-2">
-        <div>
-          <div className="flex space-x-2 items-center">
-            <h3 className="text-lg font-semibold">{request.title}</h3>
-            {request.status === "declined" && (
-              <Badge
-                variant={"outline"}
-                className="bg-red-100 text-red-500 h-5 border-0"
+        <div className="flex w-full justify-between">
+          <div>
+            <div className="flex space-x-2 items-center">
+              <h3
+                className={cn(
+                  "text-lg font-semibold",
+                  request.status === "declined" && "line-through",
+                )}
               >
-                Declined
-              </Badge>
-            )}
+                {request.title}
+              </h3>
+              {request.status === "declined" && (
+                <Badge
+                  variant={"outline"}
+                  className="bg-red-100 text-red-500 h-5 border-0"
+                >
+                  Declined
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Requested to @{request.influencer?.twitter_handle}
+            </p>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Requested to @{request.influencer?.twitter_handle}
-          </p>
         </div>
       </div>
       <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
@@ -98,6 +116,22 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
         )}
         {request.status === "pending" && (
           <div className="flex space-x-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant={"outline"} className="rounded-full">
+                  <p>Report Problems</p>
+                  <Flag className="w-4 h-4 ml-2" />{" "}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start">
+                <Textarea placeholder="Write your issue with the post here.." />
+                <div className="flex justify-end">
+                  <Button size={"sm"} className="mt-4">
+                    Submit issue
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="rounded-full bg-green-600 hover:bg-green-500">
@@ -162,4 +196,3 @@ const ProjectRequestItem: React.FC<ProjectRequestItemProps> = ({
 };
 
 export default ProjectRequestItem;
-
