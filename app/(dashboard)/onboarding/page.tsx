@@ -70,7 +70,7 @@ const OnboardingWrapper = () => {
   const percentage = useMemo(() => {
     const index = tabs.findIndex((value) => value === selectedTab);
     return ((index + 1) / tabs.length) * 100;
-  }, [selectedTab]);
+  }, [selectedTab, tabs]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

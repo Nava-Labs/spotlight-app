@@ -1,11 +1,5 @@
 import React, { useCallback, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
 import { CheckIcon, Lightbulb, Trash2Icon } from "lucide-react";
 import { ThreadRequest, RequestStatus } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";

@@ -14,13 +14,11 @@ import { CheckIcon, Flag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSpotlightClaim } from "@/app/claim";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
-import AnimatedCircularProgressBar from "@/components/ui/animated-circular-progress-bar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { PopoverArrow } from "@radix-ui/react-popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 

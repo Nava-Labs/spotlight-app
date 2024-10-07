@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useCallback, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useSpotlightRequest } from "../../../request";
 import { Influencers, ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
@@ -195,10 +193,6 @@ const InfluencerView = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
-  const wallet = useWallet();
-  const [amount, setAmount] = useState("");
-  const { request, isLoading } = useSpotlightRequest();
-
   return (
     <Tabs defaultValue="requested" className="w-full mt-6">
       <TabsList className="grid w-full grid-cols-3 rounded-full h-10 p-1">
