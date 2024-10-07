@@ -19,12 +19,29 @@ import ProjectRequestList from "./_components/ProjectRequestList";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoIcon } from "lucide-react";
+import { TooltipArrow } from "@radix-ui/react-tooltip";
 
 const CircularProgress = dynamic(
   () => import("@/components/ui/half-circular-progress"),
   {
     loading: () => <Skeleton className="w-20 h-16 rounded-lg mr-6" />,
   },
+);
+
+const SocialScoreTooltip = () => (
+  <TooltipProvider>
+    <Tooltip delayDuration={150}>
+      <TooltipTrigger asChild>
+        <InfoIcon className="h-3 w-3 ml-1 text-muted-foreground cursor-help z-10" />
+      </TooltipTrigger>
+      <TooltipContent className="bg-background text-muted-foreground border shadow-md text-sm">
+        <p>The social score is calculated based on the influencer's engagement rate,</p>
+        <p>follower count, and overall social media presence.</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 );
 
 export default function Dashboard() {
@@ -104,9 +121,12 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex flex-col min-w-max items-center ml-8 -mr-6">
-              <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
-                social score
-              </p>
+              <div className="flex items-center -mb-3">
+                <p className="text-xs uppercase text-muted-foreground font-bold">
+                  social score
+                </p>
+                <SocialScoreTooltip />
+              </div>
               <CircularProgress value={influencerData.social_score} />
             </div>
           </div>
@@ -154,9 +174,12 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex flex-col min-w-max items-center ml-8">
-              <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
-                social score
-              </p>
+              <div className="flex items-center -mb-3">
+                <p className="text-xs uppercase text-muted-foreground font-bold">
+                  social score
+                </p>
+                <SocialScoreTooltip />
+              </div>
               <CircularProgress value={influencerData.social_score} />
             </div>
           </div>
@@ -184,9 +207,12 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="flex flex-col min-w-max items-center ml-8 -mr-6">
-            <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
-              social score
-            </p>
+            <div className="flex items-center -mb-3">
+              <p className="text-xs uppercase text-muted-foreground font-bold">
+                social score
+              </p>
+              <SocialScoreTooltip />
+            </div>
             <CircularProgress value={influencerData.social_score} />
           </div>
         </div>
