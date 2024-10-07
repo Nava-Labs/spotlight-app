@@ -1,6 +1,6 @@
 import React, { useCallback, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, Lightbulb, Trash2Icon } from "lucide-react";
+import { AlertTriangle, CheckIcon, Lightbulb, Trash2Icon } from "lucide-react";
 import { ThreadRequest, RequestStatus } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useSpotlightClaim } from "@/app/claim";
@@ -10,6 +10,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 interface RequestListItemProps {
   request: ThreadRequest;
@@ -103,7 +104,7 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
         <AnimatedCircularProgressBar
           max={100}
           min={0}
-          value={89}
+          value={100 - (request.scam_probability || 0)}
           gaugePrimaryColor="#34d399"
           gaugeSecondaryColor="rgba(0, 0, 0, 0.1)"
           className="size-10 text-lg font-bold"
@@ -160,10 +161,23 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
               </Button>
             )}
           </div>
-          <CollapsibleContent className="ml-1 border-l-4 border-blue-500 bg-blue-50 mt-2 pl-4 pr-2 py-3">
-            <p className="text-sm text-muted-foreground mb-4 font-mono">
-              {">"} {request.details}
-            </p>
+          <CollapsibleContent className={cn(
+            "ml-1 border-l-4 border-blue-500 bg-blue-50 mt-2 pl-4 pr-2 py-3",
+            (request.scam_probability && request.scam_probability > 50) && "border-yellow-500 bg-yellow-50"
+          )}>
+            {request.sentiment && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-4 font-mono">
+                  {">"} {request.sentiment_explanation}
+                </p>
+                {request.scam_probability && request.scam_probability > 50 && (
+                  <div className="flex items-center mt-2 text-yellow-700 text-sm font-semibold">
+                    <AlertTriangle className="w-4 h-4 mr-2" />
+                    <span>This post may contain suspicious content. Please review carefully.</span>
+                  </div>
+                )}
+              </div>
+            )}
           </CollapsibleContent>
         </Collapsible>
       </div>
