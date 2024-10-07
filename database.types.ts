@@ -79,6 +79,9 @@ export type Database = {
           public_key: string
           request_type: string
           requested_by: string
+          scam_probability: number | null
+          sentiment: string | null
+          sentiment_explanation: string | null
           status: string
           title: string
           tweet_link: string | null
@@ -92,6 +95,9 @@ export type Database = {
           public_key: string
           request_type?: string
           requested_by: string
+          scam_probability?: number | null
+          sentiment?: string | null
+          sentiment_explanation?: string | null
           status: string
           title: string
           tweet_link?: string | null
@@ -105,6 +111,9 @@ export type Database = {
           public_key?: string
           request_type?: string
           requested_by?: string
+          scam_probability?: number | null
+          sentiment?: string | null
+          sentiment_explanation?: string | null
           status?: string
           title?: string
           tweet_link?: string | null
