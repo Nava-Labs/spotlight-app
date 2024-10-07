@@ -23,7 +23,7 @@ import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } fro
 const CircularProgress = dynamic(
   () => import("@/components/ui/half-circular-progress"),
   {
-    loading: () => <Skeleton className="w-20 h-16 rounded-lg" />,
+    loading: () => <Skeleton className="w-20 h-16 rounded-lg mr-6" />,
   },
 );
 
@@ -72,13 +72,15 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background py-4 px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex space-x-8 w-full">
-            <div className="w-full">
-              <p className="text-xl font-semibold">@{twitterHandle}</p>
-              <Skeleton className="w-1/2 h-6 rounded-lg" />
-              <Skeleton className="w-full h-6 rounded-lg mt-1" />
+          <div className="flex space-x-4 items-center">
+            <Skeleton className="!size-20 rounded-lg border-4 border-bg-muted" />
+            <div className="flex space-x-8 w-full">
+              <div className="w-full">
+                <Skeleton className="w-1/4 h-6 rounded-lg" />
+                <Skeleton className="w-1/2 h-6 rounded-lg mt-1" />
+                <Skeleton className="w-full h-6 rounded-lg mt-1" />
+              </div>
             </div>
-
             <Skeleton className="w-20 h-16 rounded-lg" />
           </div>
           <Skeleton className="w-full h-64 mt-4 rounded-lg" />
@@ -91,15 +93,17 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background py-4 px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex space-x-8 w-full">
-            <div className="w-full">
-              <p className="text-xl font-semibold">@{twitterHandle}</p>
-              <p className="text-base text-muted-foreground">
-                {influencerData.blinks_description}
-              </p>
+          <div className="w-full flex justify-between">
+            <div className="flex space-x-4 items-center">
+              <img src={"https://unavatar.io/x/" + twitterHandle} className="size-20 rounded-lg border-4 border-bg-muted" />
+              <div>
+                <p className="text-xl font-semibold">@{twitterHandle}</p>
+                <p className="text-base text-muted-foreground">
+                  {influencerData.blinks_description}
+                </p>
+              </div>
             </div>
-
-            <div className="flex flex-col min-w-max items-center ml-8">
+            <div className="flex flex-col min-w-max items-center ml-8 -mr-6">
               <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
                 social score
               </p>
@@ -140,11 +144,14 @@ export default function Dashboard() {
       <div className="min-h-screen bg-background py-4 px-8">
         <div className="max-w-4xl mx-auto">
           <div className="w-full flex justify-between">
-            <div>
-              <p className="text-xl font-semibold">@{twitterHandle}</p>
-              <p className="text-base text-muted-foreground">
-                {influencerData.blinks_description}
-              </p>
+            <div className="flex space-x-4 items-center">
+              <img src={"https://unavatar.io/x/" + twitterHandle} className="size-20 rounded-lg border-4 border-bg-muted" />
+              <div>
+                <p className="text-xl font-semibold">@{twitterHandle}</p>
+                <p className="text-base text-muted-foreground">
+                  {influencerData.blinks_description}
+                </p>
+              </div>
             </div>
             <div className="flex flex-col min-w-max items-center ml-8">
               <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
@@ -167,13 +174,16 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background py-4 px-8">
       <div className="max-w-4xl mx-auto">
         <div className="w-full flex justify-between">
-          <div>
-            <p className="text-xl font-semibold">@{twitterHandle}</p>
-            <p className="text-base text-muted-foreground">
-              {influencerData.blinks_description}
-            </p>
+          <div className="flex space-x-4 items-center">
+            <img src={"https://unavatar.io/x/" + twitterHandle} className="size-20 rounded-lg border-4 border-bg-muted" />
+            <div>
+              <p className="text-xl font-semibold">@{twitterHandle}</p>
+              <p className="text-base text-muted-foreground">
+                {influencerData.blinks_description}
+              </p>
+            </div>
           </div>
-          <div className="flex flex-col min-w-max items-center ml-8">
+          <div className="flex flex-col min-w-max items-center ml-8 -mr-6">
             <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
               social score
             </p>

@@ -11,6 +11,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import TypingAnimation from "@/components/ui/typing-animation";
 
 interface RequestListItemProps {
   request: ThreadRequest;
@@ -101,14 +102,6 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
             By {request.requested_by}
           </p>
         </div>
-        <AnimatedCircularProgressBar
-          max={100}
-          min={0}
-          value={100 - (request.scam_probability || 0)}
-          gaugePrimaryColor="#34d399"
-          gaugeSecondaryColor="rgba(0, 0, 0, 0.1)"
-          className="size-10 text-lg font-bold"
-        />
       </div>
       <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
         {request.details}
@@ -116,12 +109,22 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
       <div>
         <Collapsible>
           <div className="flex justify-between items-center">
-            <CollapsibleTrigger asChild>
-              <Button variant="outline" className="rounded-full">
-                <p>Read AI Analysis</p>
-                <Lightbulb className="size-4 ml-2" />
-              </Button>
-            </CollapsibleTrigger>
+            <div className="flex items-center space-x-2">
+              <AnimatedCircularProgressBar
+                max={100}
+                min={0}
+                value={100 - (request.scam_probability || 0)}
+                gaugeSecondaryColor="rgba(0, 0, 0, 0.1)"
+                className="size-8 text-sm font-bold"
+              />
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" className="rounded-full">
+                  <p>Read AI Analysis</p>
+                  <Lightbulb className="size-4 ml-2" />
+                </Button>
+              </CollapsibleTrigger>
+            </div>
+
             {status === "requested" && (
               <div className="flex space-x-2">
                 <Button
@@ -167,9 +170,11 @@ const RequestListItem: React.FC<RequestListItemProps> = ({
           )}>
             {request.sentiment && (
               <div>
-                <p className="text-sm text-muted-foreground mb-4 font-mono">
-                  {">"} {request.sentiment_explanation}
-                </p>
+                <TypingAnimation
+                  className="text-sm text-muted-foreground font-normal mb-4 font-mono"
+                  duration={10}
+                  text={"> " + request.sentiment_explanation}
+                />
                 {request.scam_probability && request.scam_probability > 50 && (
                   <div className="flex items-center mt-2 text-yellow-700 text-sm font-semibold">
                     <AlertTriangle className="w-4 h-4 mr-2" />

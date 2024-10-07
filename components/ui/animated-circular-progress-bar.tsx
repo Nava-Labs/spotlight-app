@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
+import { useMemo } from "react";
 
 interface Props {
   max: number;
   value: number;
   min: number;
-  gaugePrimaryColor: string;
   gaugeSecondaryColor: string;
   className?: string;
 }
@@ -13,13 +13,27 @@ export default function AnimatedCircularProgressBar({
   max = 100,
   min = 0,
   value = 0,
-  gaugePrimaryColor,
   gaugeSecondaryColor,
   className,
 }: Props) {
   const circumference = 2 * Math.PI * 45;
   const percentPx = circumference / 100;
   const currentPercent = ((value - min) / (max - min)) * 100;
+
+  const colors = useMemo(
+    () => ({
+      red: "#EF4444",
+      orange: "#F59E0B",
+      green: "#10B981",
+    }),
+    [],
+  );
+
+  const getColors = useMemo(() => {
+    if (value <= 30) return colors.red;
+    if (value <= 70) return colors.orange;
+    if (value > 70) return colors.green;
+  }, [colors, value]);
 
   return (
     <div
@@ -82,7 +96,7 @@ export default function AnimatedCircularProgressBar({
           className="opacity-100"
           style={
             {
-              stroke: gaugePrimaryColor,
+              stroke: getColors,
               "--stroke-percent": currentPercent,
               strokeDasharray:
                 "calc(var(--stroke-percent) * var(--percent-to-px)) var(--circumference)",
