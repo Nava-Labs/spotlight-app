@@ -67,7 +67,6 @@ async function calculateSocialScore(
   accessToken: string, 
   userId: string
 ) {
-  userId = "473622999"
   // Fetch user data
   const userResponse = await fetch(
     `https://api.twitter.com/2/users/${userId}?user.fields=public_metrics`,
@@ -82,7 +81,7 @@ async function calculateSocialScore(
 
   // Fetch recent tweets
   const tweetsResponse = await fetch(
-    `https://api.twitter.com/2/users/${userId}/tweets?max_results=100&tweet.fields=public_metrics`,
+    `https://api.twitter.com/2/users/${userId}/tweets?max_results=100&tweet.fields=public_metrics&exclude=retweets`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -95,25 +94,33 @@ async function calculateSocialScore(
   // Calculate score
   const { followers_count, following_count } = userData.data.public_metrics;
   const followerRatio = followers_count / (following_count || 1);
+  
+  // Apply logarithmic scaling to follower ratio
+  const scaledFollowerRatio = Math.log10(followerRatio + 1);
 
   let totalEngagements = 0;
   let tweetCount = 0;
 
   for (const tweet of recentTweets.data) {
     const { retweet_count, reply_count, like_count } = tweet.public_metrics;
-    totalEngagements += retweet_count + reply_count + like_count;
+    // Apply weights to each metric
+    totalEngagements += 
+      reply_count * 4 +
+      retweet_count * 3 +
+      like_count * 2;
     tweetCount++;
   }
 
   const averageEngagementPerTweet = totalEngagements / (tweetCount || 1);
   const engagementRate = averageEngagementPerTweet / (followers_count || 1);
 
+  console.log('SCALED FOLLOWER RATIO >>>>>', scaledFollowerRatio);
   console.log('ENGAGEMENT RATE >>>>>', {engagementRate, averageEngagementPerTweet, totalEngagements, tweetCount, followers_count});
 
   // Calculate score (0-100)
   const score = Math.min(
     100,
-    Math.round((followerRatio * 30 + engagementRate * 1000000 * 70) * 100) / 100
+    Math.round((scaledFollowerRatio * 50 + engagementRate * 50) * 100) / 100
   );
 
   return score;

@@ -55,7 +55,10 @@ export default function Onboarding() {
 
 const OnboardingWrapper = () => {
   // NOTE: the order of it is important
-  const tabs = ["account", "information", "pricing", "completed"];
+  const tabs = useMemo(
+    () => ["account", "information", "pricing", "completed"],
+    [],
+  );
 
   const wallet = useWallet();
   const router = useRouter();
