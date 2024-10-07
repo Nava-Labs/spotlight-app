@@ -104,6 +104,8 @@ async function calculateSocialScore(accessToken: string, userId: string) {
   const averageEngagementPerTweet = totalEngagements / (tweetCount || 1);
   const engagementRate = averageEngagementPerTweet / (followers_count || 1);
 
+  console.log('ENGAGEMENT RATE >>>>>', {engagementRate, averageEngagementPerTweet, totalEngagements, tweetCount, followers_count});
+
   // Calculate score (0-100)
   const score = Math.min(
     100,
