@@ -8,6 +8,8 @@ import { Influencers, ThreadRequest } from "@/types";
 import useSupabaseBrowser from "@/hooks/useSupabaseBrowser";
 import { useQuery as useSupabaseQuery } from "@supabase-cache-helpers/postgrest-react-query";
 import { useParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { PencilLine, Repeat2, Share2 } from "lucide-react";
 
 import ApprovedEmptyState from "@/public/empty-states/approved.svg";
 import { Badge } from "@/components/ui/badge";
@@ -16,12 +18,12 @@ import RequestList from "./_components/RequestList";
 import ProjectRequestList from "./_components/ProjectRequestList";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
-import Spinner from "@/components/ui/spinner";
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
 
 const CircularProgress = dynamic(
   () => import("@/components/ui/half-circular-progress"),
   {
-    loading: () => <Spinner size="xl" />,
+    loading: () => <Skeleton className="w-20 h-16 rounded-lg" />,
   },
 );
 
@@ -190,6 +192,7 @@ export default function Dashboard() {
     </div>
   );
 }
+
 const ProjectView = ({
   requests,
   influencerData,
@@ -223,66 +226,109 @@ const InfluencerView = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
+
+  const tweetText = encodeURIComponent(
+    "Check out my Spotlight profile and request a tweet from me! 🚀\n\n"
+  );
+  const repostUrl = encodeURIComponent(
+    `https://www.spotlightprotocol.xyz/api/repost-request?creator=${influencerData.twitter_handle}`
+  );
+  const postUrl = encodeURIComponent(
+    `https://www.spotlightprotocol.xyz/api/post-request?creator=${influencerData.twitter_handle}`
+  );
+  const twitterSharePostUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${postUrl}`;
+  const twitterShareRepostUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${repostUrl}`;
   return (
-    <Tabs defaultValue="requested" className="w-full mt-6">
-      <TabsList className="grid w-full grid-cols-3 rounded-full h-10 p-1">
-        <TabsTrigger value="requested" className="rounded-full space-x-2">
-          <p>Requested</p>
-          {!!requests.filter((req) => req.status === "requested").length && (
-            <Badge className="px-1 py-0 bg-zinc-500">
-              {requests.filter((req) => req.status === "requested").length}
-            </Badge>
-          )}
-        </TabsTrigger>
-        <TabsTrigger value="pending" className="rounded-full space-x-2">
-          <p>Pending</p>
-          {!!requests.filter((req) => req.status === "pending").length && (
-            <Badge className="px-1 py-0 bg-zinc-500">
-              {requests.filter((req) => req.status === "pending").length}
-            </Badge>
-          )}
-        </TabsTrigger>
-        <TabsTrigger value="approved" className="rounded-full space-x-2">
-          <p>Approved</p>
-          {!!requests.filter((req) => req.status === "approved").length && (
-            <Badge className="px-1 py-0 bg-zinc-500">
-              {requests.filter((req) => req.status === "approved").length}
-            </Badge>
-          )}
-        </TabsTrigger>
-      </TabsList>
-      <Card className="mt-2">
-        <TabsContent value="requested" className="mt-0">
-          <CardContent className="p-0">
-            <RequestList
-              requests={requests}
-              status="requested"
-              refetchRequests={refetchRequests}
-              influencerTwitterHandle={influencerData.twitter_handle ?? ""}
-            />
-          </CardContent>
-        </TabsContent>
-        <TabsContent value="pending" className="mt-0">
-          <CardContent className="p-0">
-            <RequestList
-              requests={requests}
-              status="pending"
-              refetchRequests={refetchRequests}
-              influencerTwitterHandle={influencerData.twitter_handle ?? ""}
-            />
-          </CardContent>
-        </TabsContent>
-        <TabsContent value="approved" className="mt-0">
-          <CardContent className="p-0">
-            <RequestList
-              requests={requests}
-              status="approved"
-              refetchRequests={refetchRequests}
-              influencerTwitterHandle={influencerData.twitter_handle ?? ""}
-            />
-          </CardContent>
-        </TabsContent>
-      </Card>
-    </Tabs>
+    <>
+      <Tabs defaultValue="requested" className="w-full mt-6">
+        <div className="flex justify-between">
+          <TabsList className="grid grid-cols-3 rounded-full h-10 p-1">
+            <TabsTrigger value="requested" className="rounded-full space-x-2 px-4">
+              <p>Requested</p>
+              {!!requests.filter((req) => req.status === "requested").length && (
+                <Badge className="px-1 py-0 bg-zinc-500">
+                  {requests.filter((req) => req.status === "requested").length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="rounded-full space-x-2 px-4">
+              <p>Pending</p>
+              {!!requests.filter((req) => req.status === "pending").length && (
+                <Badge className="px-1 py-0 bg-zinc-500">
+                  {requests.filter((req) => req.status === "pending").length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="approved" className="rounded-full space-x-2 px-4">
+              <p>Approved</p>
+              {!!requests.filter((req) => req.status === "approved").length && (
+                <Badge className="px-1 py-0 bg-zinc-500">
+                  {requests.filter((req) => req.status === "approved").length}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
+          <Menubar className="border-0">
+            <MenubarMenu>
+              <MenubarTrigger asChild>
+                <Button
+                  variant={'outline'}
+                  className="rounded-full h-10 border-dashed"
+                >
+                  <p>Share Blinks</p>
+                  <Share2 className="ml-2 size-4" />
+                </Button>
+              </MenubarTrigger>
+              <MenubarContent>
+                <MenubarItem
+                  onClick={() => window.open(twitterSharePostUrl, "_blank")}
+                >
+                  <p>Post Blinks</p>
+                  <PencilLine className="ml-2 size-4" />
+                </MenubarItem>
+                <MenubarItem
+                  onClick={() => window.open(twitterShareRepostUrl, "_blank")}
+                >
+                  <p>Instant Repost Blinks</p>
+                  <Repeat2 className="ml-2 size-4" />
+                </MenubarItem>
+              </MenubarContent>
+            </MenubarMenu>
+          </Menubar>
+        </div>
+        <Card className="mt-2">
+          <TabsContent value="requested" className="mt-0">
+            <CardContent className="p-0">
+              <RequestList
+                requests={requests}
+                status="requested"
+                refetchRequests={refetchRequests}
+                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+              />
+            </CardContent>
+          </TabsContent>
+          <TabsContent value="pending" className="mt-0">
+            <CardContent className="p-0">
+              <RequestList
+                requests={requests}
+                status="pending"
+                refetchRequests={refetchRequests}
+                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+              />
+            </CardContent>
+          </TabsContent>
+          <TabsContent value="approved" className="mt-0">
+            <CardContent className="p-0">
+              <RequestList
+                requests={requests}
+                status="approved"
+                refetchRequests={refetchRequests}
+                influencerTwitterHandle={influencerData.twitter_handle ?? ""}
+              />
+            </CardContent>
+          </TabsContent>
+        </Card>
+      </Tabs>
+    </>
   );
 };
