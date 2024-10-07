@@ -15,7 +15,15 @@ import WalletConnect from "@/app/_components/ConnectWallet";
 import RequestList from "./_components/RequestList";
 import ProjectRequestList from "./_components/ProjectRequestList";
 import { Skeleton } from "@/components/ui/skeleton";
-import CircularProgress from "@/components/ui/half-circular-progress";
+import dynamic from "next/dynamic";
+import Spinner from "@/components/ui/spinner";
+
+const CircularProgress = dynamic(
+  () => import("@/components/ui/half-circular-progress"),
+  {
+    loading: () => <Spinner size="xl" />,
+  },
+);
 
 export default function Dashboard() {
   const wallet = useWallet();
