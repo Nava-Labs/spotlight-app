@@ -13,36 +13,36 @@ const openai = new OpenAI({
 
 
 export const POST = async (req: Request) => {
+  const requestUrl = new URL(req.url);
+  const params = validatedQueryParams(requestUrl);
+
+  const supabaseClient = getSupabaseServerClient();
+
+  const { data: influencer } = await supabaseClient
+    .from("influencers")
+    .select("*")
+    .eq("twitter_handle", params.creator)
+    .single();
+
+  if (!influencer) {
+    return Response.json(
+      { message: "Can't find any influencer" },
+      {
+        status: 404,
+      },
+    );
+  }
+
+  switch (params.requestType) {
+    case "post":
+      return await postAction(req, params, influencer);
+    case "repost":
+      return await repostAction(req, params, influencer);
+
+    default:
+      break;
+  }
   try {
-    const requestUrl = new URL(req.url);
-    const params = validatedQueryParams(requestUrl);
-
-    const supabaseClient = getSupabaseServerClient();
-
-    const { data: influencer } = await supabaseClient
-      .from("influencers")
-      .select("*")
-      .eq("twitter_handle", params.creator)
-      .single();
-
-    if (!influencer) {
-      return Response.json(
-        { message: "Can't find any influencer" },
-        {
-          status: 404,
-        },
-      );
-    }
-
-    switch (params.requestType) {
-      case "post":
-        return await postAction(req, params, influencer);
-      case "repost":
-        return await repostAction(req, params, influencer);
-
-      default:
-        break;
-    }
   } catch (e) {
     return Response.json({ msg: "Failed to post!", err: e }, { status: 400 });
   }
