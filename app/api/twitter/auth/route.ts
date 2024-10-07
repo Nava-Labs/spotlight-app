@@ -63,7 +63,7 @@ async function fetchUserData(accessToken: string) {
   }
 }
 
-async function calculateSocialScore(accessToken: string, userId: string) {
+async function calculateSocialScore(accessToken: string, userId: string = '44196397') {
   // Fetch user data
   const userResponse = await fetch(
     `https://api.twitter.com/2/users/${userId}?user.fields=public_metrics`,
