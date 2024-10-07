@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import WalletConnect from "@/app/_components/ConnectWallet";
 import RequestList from "./_components/RequestList";
 import ProjectRequestList from "./_components/ProjectRequestList";
+import { Skeleton } from "@/components/ui/skeleton";
+import CircularProgress from "@/components/ui/half-circular-progress";
 
 export default function Dashboard() {
   const wallet = useWallet();
@@ -56,22 +58,42 @@ export default function Dashboard() {
     }
   }, [wallet]);
 
-  if (!influencerData || !wallet.publicKey || !requestsData) {
+  if (!influencerData || !requestsData) {
     return (
       <div className="min-h-screen bg-background py-4 px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex space-x-8">
-            <div>
+          <div className="flex space-x-8 w-full">
+            <div className="w-full">
+              <p className="text-xl font-semibold">@{twitterHandle}</p>
+              <Skeleton className="w-1/2 h-6 rounded-lg" />
+              <Skeleton className="w-full h-6 rounded-lg mt-1" />
+            </div>
+
+            <Skeleton className="w-20 h-16 rounded-lg" />
+          </div>
+          <Skeleton className="w-full h-64 mt-4 rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!wallet.publicKey) {
+    return (
+      <div className="min-h-screen bg-background py-4 px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex space-x-8 w-full">
+            <div className="w-full">
               <p className="text-xl font-semibold">@{twitterHandle}</p>
               <p className="text-base text-muted-foreground">
-                {influencerData?.blinks_description}
+                {influencerData.blinks_description}
               </p>
             </div>
-            <div className="flex flex-col min-w-max items-center">
-              <p className="text-xs uppercase text-muted-foreground">
+
+            <div className="flex flex-col min-w-max items-center ml-8">
+              <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
                 social score
               </p>
-              <p className="text-5xl font-bold">78</p>
+              <CircularProgress value={influencerData.social_score} />
             </div>
           </div>
           <Card className="relative mt-4 flex h-64 w-full flex-col items-center justify-between gap-3 rounded-md bg-transparent overflow-hidden">
@@ -115,10 +137,10 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex flex-col min-w-max items-center ml-8">
-              <p className="text-xs uppercase text-muted-foreground">
+              <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
                 social score
               </p>
-              <p className="text-5xl font-bold">78</p>
+              <CircularProgress value={influencerData.social_score} />
             </div>
           </div>
           <ProjectView
@@ -138,14 +160,14 @@ export default function Dashboard() {
           <div>
             <p className="text-xl font-semibold">@{twitterHandle}</p>
             <p className="text-base text-muted-foreground">
-              {influencerData?.blinks_description}
+              {influencerData.blinks_description}
             </p>
           </div>
           <div className="flex flex-col min-w-max items-center ml-8">
-            <p className="text-xs uppercase text-muted-foreground">
+            <p className="text-xs uppercase text-muted-foreground font-bold -mb-3">
               social score
             </p>
-            <p className="text-5xl font-bold">78</p>
+            <CircularProgress value={influencerData.social_score} />
           </div>
         </div>
         <InfluencerView
