@@ -59,6 +59,7 @@ async function postAction(
   const { requestType, username, details, title } = params;
   const sentimentResult = await analyzeSentiment(details);
 
+  console.log("SENTIMENT RESULT >>>", sentimentResult);
   const { error } = await supabaseClient.from("requests").insert({
     public_key: body.account,
     influencer_id: influencer.id,
