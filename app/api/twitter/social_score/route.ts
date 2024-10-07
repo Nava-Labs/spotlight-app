@@ -57,7 +57,8 @@ async function calculateSocialScore(accessToken: string, userId: string) {
   // Calculate score (0-100)
   const score = Math.min(
     100,
-    Math.round((scaledFollowerRatio * 50 + engagementRate * 50) * 100) / 100,
+    // Math.round((scaledFollowerRatio * 50 + engagementRate * 50) * 100) / 100,
+    Math.round((engagementRate * 10_000) * 100) / 100,
   );
 
   return score;
@@ -66,7 +67,7 @@ async function calculateSocialScore(accessToken: string, userId: string) {
 export async function POST(request: NextRequest) {
   const { userId } = await request.json();
   const accessToken =
-    "X1JKeGNOanhtYnZDT01oVHJHeTI3dnNrRWlnaVRxejlNdFpvTktBSnkyeUo0OjE3MjgyNzUzMDc2MzQ6MToxOmF0OjE";
+    "aHFtZmdJT3lqVEVHbm1xWm16RzNUZnFiQjM1akZkNmlja05OQXlFNWtUTVdCOjE3MjgyOTg5NjgwMzY6MToxOmF0OjE";
   try {
     // Calculate social score
     const socialScore = await calculateSocialScore(accessToken, userId);
