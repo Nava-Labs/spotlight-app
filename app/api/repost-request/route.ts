@@ -2,7 +2,6 @@ import {
   ActionGetResponse,
   ActionPostRequest,
   ActionPostResponse,
-  ACTIONS_CORS_HEADERS,
   createActionHeaders,
   createPostResponse,
 } from "@solana/actions";
