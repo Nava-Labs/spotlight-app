@@ -2,7 +2,7 @@ import {
   ActionGetResponse,
   ActionPostRequest,
   ActionPostResponse,
-  createActionHeaders,
+  ACTIONS_CORS_HEADERS,
   createPostResponse,
 } from "@solana/actions";
 import {
@@ -20,8 +20,6 @@ import {
 } from "@solana/web3.js";
 import BN from "bn.js";
 import { getSupabaseServerClient } from "@/lib/supabase/server-client";
-
-const headers = createActionHeaders();
 
 export const GET = async (req: Request) => {
   const requestUrl = new URL(req.url);
@@ -42,7 +40,7 @@ export const GET = async (req: Request) => {
       },
       {
         status: 400,
-        headers,
+        headers: ACTIONS_CORS_HEADERS,
       },
     );
   }
@@ -93,12 +91,11 @@ export const GET = async (req: Request) => {
   };
 
   return Response.json(payload, {
-    // headers: {
-    //   ...ACTIONS_CORS_HEADERS,
-    //   "X-Action-Version": "2.1.3",
-    //   "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
-    // },
-    headers,
+    headers: {
+      ...ACTIONS_CORS_HEADERS,
+      "X-Action-Version": "2.1.3",
+      "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+    },
   });
 };
 
@@ -122,7 +119,7 @@ export const POST = async (req: Request) => {
     } catch (e) {
       return Response.json(
         { msg: "Invalid Pubkey params!", err: e },
-        { status: 400, headers },
+        { status: 400, headers: ACTIONS_CORS_HEADERS },
       );
     }
 
@@ -208,12 +205,16 @@ export const POST = async (req: Request) => {
 
     return Response.json(payload, {
       status: 200,
-      headers,
+      headers: {
+        ...ACTIONS_CORS_HEADERS,
+        "X-Action-Version": "2.1.3",
+        "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+      },
     });
   } catch (e) {
     return Response.json(
       { msg: "Failed to post!", err: e },
-      { status: 400, headers },
+      { status: 400, headers: ACTIONS_CORS_HEADERS },
     );
   }
 };
