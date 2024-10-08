@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
       return new ImageResponse(
         <>Visit with &quot;?twitter_handle=vercel&quot;</>,
         {
-          width: 4500,
-          height: 4500,
+          width: 1000,
+          height: 1000,
         },
       );
     }
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 color: "transparent",
-                fontSize: "450px",
+                fontSize: "100px",
                 fontFamily: "Manrope-SemiBold",
                 justifyContent: "center",
                 alignSelf: "center",
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
                 backgroundClip: "text",
                 WebkitBackgroundClip: "text",
                 color: "transparent",
-                fontSize: "200px",
+                fontSize: "60px",
                 fontFamily: "Manrope-SemiBold",
                 justifyContent: "center",
                 alignSelf: "center",
@@ -93,18 +93,18 @@ export async function GET(request: NextRequest) {
             </div>
 
             <img
-              width="800"
-              height="800"
+              width="300"
+              height="300"
               src={`https://unavatar.io/twitter/${twitterHandle}`}
-              tw="mt-60"
+              tw="mt-10"
             />
-            <p tw="text-9xl text-white mt-20 ">@{twitterHandle}</p>
+            <p tw="text-xl text-white mt-10 ">@{twitterHandle}</p>
           </div>
         </div>
       ),
       {
-        width: 4500,
-        height: 4500,
+        width: 1000,
+        height: 1000,
         fonts: [
           {
             name: "Manrope",
