@@ -130,49 +130,44 @@ export async function POST(request: NextRequest) {
   const { code } = await request.json();
   const supabase = getSupabaseServerClient();
 
-  const tokenResponse = await fetchUserToken(code);
-  const accessToken = tokenResponse.access_token;
+  try {
+    const tokenResponse = await fetchUserToken(code);
+    const accessToken = tokenResponse.access_token;
 
-  if (accessToken) {
-    const userDataResponse = await fetchUserData(accessToken);
-    const userCredentials = { ...tokenResponse, ...userDataResponse?.data };
+    if (accessToken) {
+      const userDataResponse = await fetchUserData(accessToken);
+      const userCredentials = { ...tokenResponse, ...userDataResponse?.data };
 
-    console.log("USER CREDENTIALS >>>>>", { accessToken, userDataResponse });
-    // Calculate social score
-    const socialScore = await calculateSocialScore(
-      accessToken,
-      userDataResponse?.data.id ?? "",
-    );
-    console.log("SOCIAL SCORE >>>>>", { socialScore });
+      console.log("USER CREDENTIALS >>>>>", { accessToken, userDataResponse });
+      // Calculate social score
+      const socialScore = await calculateSocialScore(
+        accessToken,
+        userDataResponse?.data.id ?? "",
+      );
+      console.log("SOCIAL SCORE >>>>>", { socialScore });
 
-    const { data, error } = await supabase
-      .from("influencers")
-      .insert({
+      const { error } = await supabase.from("influencers").insert({
         public_key: "",
         twitter_id: userDataResponse?.data.id,
         twitter_handle: userDataResponse?.data.username,
         price: 0,
         access_token: userCredentials.access_token,
         social_score: Number(socialScore.toFixed(0)), // Add this line
-      })
-      .select()
-      .single();
+      });
 
-    console.log("INFLUENCERS DATA >>>>>", { data });
-    if (!error) {
-      return NextResponse.json(
-        { ...userCredentials, socialScore },
-        { status: 200 },
-      );
-    } else {
-      return NextResponse.json(
-        { error: "Error inserting influencer data" },
-        { status: 400 },
-      );
+      if (!error) {
+        return NextResponse.json(
+          { ...userCredentials, socialScore },
+          { status: 200 },
+        );
+      } else {
+        return NextResponse.json(
+          { error: "Error inserting influencer data" },
+          { status: 400 },
+        );
+      }
     }
-  }
 
-  try {
     return NextResponse.json(
       { error: "No access token received" },
       { status: 400 },
