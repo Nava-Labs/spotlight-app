@@ -145,15 +145,20 @@ export async function POST(request: NextRequest) {
     );
     console.log("SOCIAL SCORE >>>>>", { socialScore });
 
-    const { error } = await supabase.from("influencers").insert({
-      public_key: "",
-      twitter_id: userDataResponse?.data.id,
-      twitter_handle: userDataResponse?.data.username,
-      price: 0,
-      access_token: userCredentials.access_token,
-      social_score: socialScore, // Add this line
-    });
+    const { data, error } = await supabase
+      .from("influencers")
+      .insert({
+        public_key: "",
+        twitter_id: userDataResponse?.data.id,
+        twitter_handle: userDataResponse?.data.username,
+        price: 0,
+        access_token: userCredentials.access_token,
+        social_score: socialScore, // Add this line
+      })
+      .select()
+      .single();
 
+    console.log("INFLUENCERS DATA >>>>>", { data });
     if (!error) {
       return NextResponse.json(
         { ...userCredentials, socialScore },
