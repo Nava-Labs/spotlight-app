@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
         twitter_handle: userDataResponse?.data.username,
         price: 0,
         access_token: userCredentials.access_token,
-        social_score: socialScore, // Add this line
+        social_score: Number(socialScore.toFixed(0)), // Add this line
       })
       .select()
       .single();
