@@ -1,5 +1,6 @@
+import { getSupabaseServerClient } from "@/lib/supabase/server-client";
 import { ImageResponse } from "next/og";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
 
@@ -18,6 +19,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const supabaseClient = getSupabaseServerClient();
+
+    const { data: influencer } = await supabaseClient
+      .from("influencers")
+      .select("social_score")
+      .eq("twitter_handle", twitterHandle)
+      .single();
+
+    if (!influencer) {
+      return NextResponse.json(
+        { error: "No influencer's found" },
+        { status: 500 },
+      );
+    }
+
     const fontData = await fetch(
       new URL("/app/fonts/Manrope-Bold.ttf", import.meta.url),
     ).then((res) => res.arrayBuffer());
@@ -28,12 +44,6 @@ export async function GET(request: NextRequest) {
       const base64 = Buffer.from(arrayBuffer).toString("base64");
       return `data:image/png;base64,${base64}`;
     });
-
-    const getRandomScore = () => {
-      return Math.floor(Math.random() * (100 - 80 + 1)) + 80;
-    };
-
-    const randomScore = getRandomScore();
 
     return new ImageResponse(
       (
@@ -74,7 +84,7 @@ export async function GET(request: NextRequest) {
                 alignSelf: "center",
               }}
             >
-              {randomScore}
+              {influencer.social_score}
             </p>
             <div
               style={{
