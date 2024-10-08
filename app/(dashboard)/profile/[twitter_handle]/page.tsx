@@ -18,10 +18,20 @@ import RequestList from "./_components/RequestList";
 import ProjectRequestList from "./_components/ProjectRequestList";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
-import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarTrigger } from "@/components/ui/menubar";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { InfoIcon } from "lucide-react";
-import { TooltipArrow } from "@radix-ui/react-tooltip";
 
 const CircularProgress = dynamic(
   () => import("@/components/ui/half-circular-progress"),
@@ -37,7 +47,10 @@ const SocialScoreTooltip = () => (
         <InfoIcon className="h-3 w-3 ml-1 text-muted-foreground cursor-help z-10" />
       </TooltipTrigger>
       <TooltipContent className="bg-background text-muted-foreground border shadow-md text-sm">
-        <p>The social score is calculated based on the influencer's engagement rate,</p>
+        <p>
+          The social score is calculated based on the influencer&apos;s
+          engagement rate,
+        </p>
         <p>follower count, and overall social media presence.</p>
       </TooltipContent>
     </Tooltip>
@@ -112,7 +125,10 @@ export default function Dashboard() {
         <div className="max-w-4xl mx-auto">
           <div className="w-full flex justify-between">
             <div className="flex space-x-4 items-center">
-              <img src={"https://unavatar.io/x/" + twitterHandle} className="size-20 rounded-lg border-4 border-bg-muted" />
+              <img
+                src={"https://unavatar.io/x/" + twitterHandle}
+                className="size-20 rounded-lg border-4 border-bg-muted"
+              />
               <div>
                 <p className="text-xl font-semibold">@{twitterHandle}</p>
                 <p className="text-base text-muted-foreground">
@@ -165,7 +181,10 @@ export default function Dashboard() {
         <div className="max-w-4xl mx-auto">
           <div className="w-full flex justify-between">
             <div className="flex space-x-4 items-center">
-              <img src={"https://unavatar.io/x/" + twitterHandle} className="size-20 rounded-lg border-4 border-bg-muted" />
+              <img
+                src={"https://unavatar.io/x/" + twitterHandle}
+                className="size-20 rounded-lg border-4 border-bg-muted"
+              />
               <div>
                 <p className="text-xl font-semibold">@{twitterHandle}</p>
                 <p className="text-base text-muted-foreground">
@@ -198,7 +217,10 @@ export default function Dashboard() {
       <div className="max-w-4xl mx-auto">
         <div className="w-full flex justify-between">
           <div className="flex space-x-4 items-center">
-            <img src={"https://unavatar.io/x/" + twitterHandle} className="size-20 rounded-lg border-4 border-bg-muted" />
+            <img
+              src={"https://unavatar.io/x/" + twitterHandle}
+              className="size-20 rounded-lg border-4 border-bg-muted"
+            />
             <div>
               <p className="text-xl font-semibold">@{twitterHandle}</p>
               <p className="text-base text-muted-foreground">
@@ -262,15 +284,14 @@ const InfluencerView = ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   refetchRequests: () => Promise<any>;
 }) => {
-
   const tweetText = encodeURIComponent(
-    "Check out my Spotlight profile and request a tweet from me! 🚀\n\n"
+    "Check out my Spotlight profile and request a tweet from me! 🚀\n\n",
   );
   const repostUrl = encodeURIComponent(
-    `https://www.spotlightprotocol.xyz/api/repost-request?creator=${influencerData.twitter_handle}`
+    `https://www.spotlightprotocol.xyz/api/repost-request?creator=${influencerData.twitter_handle}`,
   );
   const postUrl = encodeURIComponent(
-    `https://www.spotlightprotocol.xyz/api/post-request?creator=${influencerData.twitter_handle}`
+    `https://www.spotlightprotocol.xyz/api/post-request?creator=${influencerData.twitter_handle}`,
   );
   const twitterSharePostUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${postUrl}`;
   const twitterShareRepostUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${repostUrl}`;
@@ -279,15 +300,22 @@ const InfluencerView = ({
       <Tabs defaultValue="requested" className="w-full mt-6">
         <div className="flex justify-between">
           <TabsList className="grid grid-cols-3 rounded-full h-10 p-1">
-            <TabsTrigger value="requested" className="rounded-full space-x-2 px-4">
+            <TabsTrigger
+              value="requested"
+              className="rounded-full space-x-2 px-4"
+            >
               <p>Requested</p>
-              {!!requests.filter((req) => req.status === "requested").length && (
+              {!!requests.filter((req) => req.status === "requested")
+                .length && (
                 <Badge className="px-1 py-0 bg-zinc-500">
                   {requests.filter((req) => req.status === "requested").length}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="pending" className="rounded-full space-x-2 px-4">
+            <TabsTrigger
+              value="pending"
+              className="rounded-full space-x-2 px-4"
+            >
               <p>Pending</p>
               {!!requests.filter((req) => req.status === "pending").length && (
                 <Badge className="px-1 py-0 bg-zinc-500">
@@ -295,7 +323,10 @@ const InfluencerView = ({
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="approved" className="rounded-full space-x-2 px-4">
+            <TabsTrigger
+              value="approved"
+              className="rounded-full space-x-2 px-4"
+            >
               <p>Approved</p>
               {!!requests.filter((req) => req.status === "approved").length && (
                 <Badge className="px-1 py-0 bg-zinc-500">
@@ -308,7 +339,7 @@ const InfluencerView = ({
             <MenubarMenu>
               <MenubarTrigger asChild>
                 <Button
-                  variant={'outline'}
+                  variant={"outline"}
                   className="rounded-full h-10 border-dashed"
                 >
                   <p>Share Blinks</p>
@@ -368,3 +399,4 @@ const InfluencerView = ({
     </>
   );
 };
+
