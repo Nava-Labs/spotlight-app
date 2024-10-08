@@ -288,10 +288,10 @@ const InfluencerView = ({
     "Check out my Spotlight profile and request a tweet from me! 🚀\n\n",
   );
   const repostUrl = encodeURIComponent(
-    `https://www.spotlightprotocol.xyz/api/repost-request?creator=${influencerData.twitter_handle}`,
+    `https://dial.to/?action=solana-action:https://www.spotlightprotocol.xyz/api/repost-request?creator=${influencerData.twitter_handle}`,
   );
   const postUrl = encodeURIComponent(
-    `https://www.spotlightprotocol.xyz/api/post-request?creator=${influencerData.twitter_handle}`,
+    `https://dial.to/?action=solana-action:https://www.spotlightprotocol.xyz/api/post-request?creator=${influencerData.twitter_handle}`,
   );
   const twitterSharePostUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${postUrl}`;
   const twitterShareRepostUrl = `https://twitter.com/intent/tweet?text=${tweetText}&url=${repostUrl}`;
@@ -399,4 +399,3 @@ const InfluencerView = ({
     </>
   );
 };
-
